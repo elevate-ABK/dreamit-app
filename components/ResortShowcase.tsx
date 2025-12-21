@@ -18,7 +18,7 @@ const resorts = [
     location: 'Greater Pilanesberg, North West', 
     category: 'Safari', 
     img: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=800',
-    url: 'https://dreamresorts.co.za/finfoot-lake-reserve/'
+    url: 'https://dreamresorts.co.za/hotels-resorts/finfoot-lake-reserve/explore'
   },
   { 
     id: 3, 
