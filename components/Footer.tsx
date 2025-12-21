@@ -1,7 +1,12 @@
 
 import React from 'react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  isAdmin?: boolean;
+  onToggleAdmin?: () => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin }) => {
   return (
     <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-6">
@@ -54,11 +59,20 @@ const Footer: React.FC = () => {
 
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs">
           <p>© 2024 Dream it marketing. All rights reserved.</p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-white">Privacy Policy</a>
-            <a href="#" className="hover:text-white">Terms of Service</a>
-            <a href="#" className="hover:text-white">Cookies</a>
+          
+          <div className="flex items-center gap-6 mt-4 md:mt-0">
+            <button 
+              onClick={onToggleAdmin}
+              className={`px-3 py-1 rounded border transition-colors ${isAdmin ? 'bg-blue-600/20 text-blue-400 border-blue-400' : 'border-slate-700 hover:border-slate-500'}`}
+            >
+              {isAdmin ? "Exit Admin Mode" : "Admin Access"}
+            </button>
+            <div className="flex space-x-6">
+              <a href="#" className="hover:text-white">Privacy Policy</a>
+              <a href="#" className="hover:text-white">Terms of Service</a>
+            </div>
           </div>
+          
           <div className="flex space-x-4 mt-4 md:mt-0">
             <i className="fab fa-facebook-f cursor-pointer hover:text-white transition-colors"></i>
             <i className="fab fa-instagram cursor-pointer hover:text-white transition-colors"></i>

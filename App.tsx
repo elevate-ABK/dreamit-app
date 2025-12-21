@@ -9,6 +9,8 @@ import AIPlanner from './components/AIPlanner';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {
+  const [isAdmin, setIsAdmin] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -16,10 +18,10 @@ const App: React.FC = () => {
         <Hero />
         <About />
         <Benefits />
-        <ResortShowcase />
+        <ResortShowcase isAdmin={isAdmin} />
         <AIPlanner />
       </main>
-      <Footer />
+      <Footer isAdmin={isAdmin} onToggleAdmin={() => setIsAdmin(!isAdmin)} />
     </div>
   );
 };

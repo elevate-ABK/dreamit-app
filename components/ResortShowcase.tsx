@@ -18,7 +18,7 @@ const DEFAULT_RESORTS = [
     location: 'Greater Pilanesberg, North West', 
     category: 'Safari', 
     img: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=800',
-    url: 'https://dreamresorts.co.za/hotels-resorts/finfoot-lake-reserve'
+    url: 'https://dreamresorts.co.za/hotels-resorts/finfoot-lake-reserve/explore/'
   },
   { 
     id: 3, 
@@ -56,7 +56,11 @@ const DEFAULT_RESORTS = [
 
 const STORAGE_KEY = 'dream_it_resorts_custom_v3';
 
-const ResortShowcase: React.FC = () => {
+interface ResortShowcaseProps {
+  isAdmin?: boolean;
+}
+
+const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
   const [activeTab, setActiveTab] = useState('All');
   const [resortList, setResortList] = useState(DEFAULT_RESORTS);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,6 +98,7 @@ const ResortShowcase: React.FC = () => {
   const triggerUpload = (e: React.MouseEvent, id: number) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!isAdmin) return;
     setUploadTargetId(id);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -130,6 +135,7 @@ const ResortShowcase: React.FC = () => {
   };
 
   const resetToDefaults = () => {
+    if (!isAdmin) return;
     if (window.confirm("Are you sure you want to reset all custom images?")) {
       setResortList(DEFAULT_RESORTS);
       localStorage.removeItem(STORAGE_KEY);
@@ -152,17 +158,19 @@ const ResortShowcase: React.FC = () => {
             <span className="text-blue-600 font-bold tracking-widest uppercase text-sm mb-4 block">Exclusive Portfolio</span>
             <h2 className="text-4xl font-bold mb-4 text-slate-900 leading-tight">Featured Destinations</h2>
             <p className="text-slate-600 max-w-xl">
-              Discover resorts where time stands still. Click the <i className="fas fa-camera mx-1 text-blue-500"></i> on any tile to upload your own photos.
+              {isAdmin ? "Admin View: Click the camera icon on any tile to upload your own photos." : "Explore our hand-picked collection of luxury resorts near the sun, sea, and safari."}
             </p>
           </div>
           
           <div className="flex flex-col items-end gap-4">
-            <button 
-              onClick={resetToDefaults}
-              className="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 group"
-            >
-              <i className="fas fa-undo-alt group-hover:rotate-[-45deg] transition-transform"></i> Reset Custom Images
-            </button>
+            {isAdmin && (
+              <button 
+                onClick={resetToDefaults}
+                className="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 group"
+              >
+                <i className="fas fa-undo-alt group-hover:rotate-[-45deg] transition-transform"></i> Reset Custom Images
+              </button>
+            )}
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map(cat => (
                 <button
@@ -192,20 +200,26 @@ const ResortShowcase: React.FC = () => {
               
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity pointer-events-none"></div>
               
+              {/* Top Bar - Locked UI Settings */}
               <div className="absolute top-4 left-4 flex justify-between items-center w-[calc(100%-2rem)] z-20">
+                {/* LARGE CENTRALIZED LABEL */}
                 <span className="text-sm font-bold tracking-widest uppercase bg-blue-600 text-white px-5 py-2 rounded-full shadow-lg min-w-[80px] inline-flex items-center justify-center">
                   {resort.category}
                 </span>
                 
-                <button 
-                  onClick={(e) => triggerUpload(e, resort.id)}
-                  title="Upload Custom Image"
-                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-xl border border-white/30"
-                >
-                  <i className="fas fa-camera text-sm"></i>
-                </button>
+                {/* CAMERA BUTTON - ADMIN ONLY */}
+                {isAdmin && (
+                  <button 
+                    onClick={(e) => triggerUpload(e, resort.id)}
+                    title="Upload Custom Image (Admin Only)"
+                    className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-xl border border-white/30"
+                  >
+                    <i className="fas fa-camera text-sm"></i>
+                  </button>
+                )}
               </div>
 
+              {/* LOCKED LINK SETTINGS */}
               <a 
                 href={resort.url} 
                 target="_blank" 
@@ -229,7 +243,7 @@ const ResortShowcase: React.FC = () => {
         <div className="mt-16 text-center">
           <p className="text-slate-500 mb-6 italic serif text-lg">Seeking a different vibe?</p>
           <a 
-            href="https://www.dreamvacationclub.co.za/resorts/" 
+            href="https://www.dreamvacs.com/resorts/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors group"
