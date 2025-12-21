@@ -1,0 +1,7 @@
+{
+  "name": "Dream it marketing - Your Lifetime Ticket to Luxury",
+  "description": "An elegant, AI-powered landing page for a premium vacation club, focusing on quality, flexibility, and the luxury of time.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
