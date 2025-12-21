@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const CATEGORIES = ['All', 'Sun', 'Safari', 'Sea', 'Mountain'];
 
 const DEFAULT_RESORTS = [
-  { 
+{ 
     id: 1, 
     name: 'Mount Amanzi', 
     location: 'Magaliesberg, Gauteng', 
