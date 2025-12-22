@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface FooterProps {
   isAdmin?: boolean;
@@ -7,8 +7,34 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin }) => {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleAdminClick = () => {
+    if (isAdmin) {
+      // If already admin, just exit
+      if (onToggleAdmin) onToggleAdmin();
+    } else {
+      setShowLoginModal(true);
+    }
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Corrected password as per user request: 072111
+    if (password === '072111') {
+      if (onToggleAdmin) onToggleAdmin();
+      setShowLoginModal(false);
+      setPassword('');
+      setError('');
+    } else {
+      setError('Invalid admin credentials.');
+    }
+  };
+
   return (
-    <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800">
+    <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800 relative">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-1">
@@ -62,7 +88,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin }) => {
           
           <div className="flex items-center gap-6 mt-4 md:mt-0">
             <button 
-              onClick={onToggleAdmin}
+              onClick={handleAdminClick}
               className={`px-3 py-1 rounded border transition-colors ${isAdmin ? 'bg-blue-600/20 text-blue-400 border-blue-400' : 'border-slate-700 hover:border-slate-500'}`}
             >
               {isAdmin ? "Exit Admin Mode" : "Admin Access"}
@@ -80,6 +106,70 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin }) => {
           </div>
         </div>
       </div>
+
+      {/* Admin Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl animate-[fadeInUp_0.3s_ease-out]">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i className="fas fa-user-shield"></i>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900">Admin Login</h3>
+              <p className="text-slate-500 text-sm mt-1">Please enter your management password</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <input 
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  autoFocus
+                  className={`w-full p-3 rounded-xl border ${error ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'} focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 transition-all`}
+                />
+                {error && <p className="text-red-500 text-xs mt-2 ml-1 font-medium">{error}</p>}
+              </div>
+
+              <button 
+                type="submit"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
+              >
+                Enter Admin Mode
+              </button>
+            </form>
+
+            <div className="mt-6 text-center space-y-3">
+              <a 
+                href="mailto:abkdigitalcreations@gmail.com?subject=Dream It Admin Password Reset Request"
+                className="text-blue-600 text-xs font-bold hover:underline"
+              >
+                Forgotten Password? Request Reset
+              </a>
+              <div>
+                <button 
+                  onClick={() => {
+                    setShowLoginModal(false);
+                    setError('');
+                    setPassword('');
+                  }}
+                  className="text-slate-400 text-xs hover:text-slate-600 font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
     </footer>
   );
 };

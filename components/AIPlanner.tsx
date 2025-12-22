@@ -35,7 +35,7 @@ const AIPlanner: React.FC = () => {
       <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <circle cx="80" cy="20" r="30" fill="white" />
-          <path d="M0,50 Q25,30 50,50 T100,50" stroke="white" fill="transparent" strokeWidth="0.5" />
+          {/* Removed wavy path line */}
         </svg>
       </div>
 
