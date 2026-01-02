@@ -68,7 +68,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
   const startSession = async () => {
     try {
       setStatus('Connecting...');
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
       
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
@@ -97,7 +97,10 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
             scriptProcessor.connect(audioContextRef.current!.destination);
           },
           onmessage: async (message: LiveServerMessage) => {
-            const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
+            // FIX for TS18048: Safely access the first part of the model turn
+            const parts = message.serverContent?.modelTurn?.parts;
+            const base64Audio = parts?.[0]?.inlineData?.data;
+
             if (base64Audio && outputAudioContextRef.current) {
               setIsSpeaking(true);
               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outputAudioContextRef.current.currentTime);
