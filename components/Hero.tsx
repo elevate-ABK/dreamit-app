@@ -33,15 +33,15 @@ const Hero: React.FC<HeroProps> = ({ onContactClick }) => {
 
   const LogoSignature = () => {
     const hasLogos = logos.logo1 || logos.logo2;
-    if (!hasLogos) return <div className="mb-10" />;
+    if (!hasLogos) return <div className="mb-6 md:mb-10" />;
     return (
       <div className="flex flex-col items-start gap-4 mb-6 md:mb-10 opacity-0 animate-[fadeInUp_1.5s_ease-out_0.2s_forwards]">
         <div className="flex items-center gap-4 md:gap-8">
           {logos.logo1 && (
-            <img src={logos.logo1} alt="Logo 1" className="h-12 md:h-16 object-contain" />
+            <img src={logos.logo1} alt="Logo 1" className="h-10 md:h-14 object-contain" />
           )}
           {logos.logo2 && (
-            <img src={logos.logo2} alt="Logo 2" className="h-12 md:h-16 object-contain" />
+            <img src={logos.logo2} alt="Logo 2" className="h-10 md:h-14 object-contain" />
           )}
         </div>
       </div>
@@ -70,9 +70,9 @@ const Hero: React.FC<HeroProps> = ({ onContactClick }) => {
       {/* Overlays */}
       <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
 
-      {/* Content - Left Aligned for classic luxury feel */}
+      {/* Content - Left Aligned with top padding to clear header */}
       <div 
-        className="relative z-10 w-full max-w-7xl mx-auto px-6"
+        className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-32 md:pt-40"
         style={{ 
           transform: `translateY(${-scrollY * 0.05}px)`,
           transition: 'transform 0.1s ease-out'
@@ -81,19 +81,19 @@ const Hero: React.FC<HeroProps> = ({ onContactClick }) => {
         <div className="max-w-4xl">
           <LogoSignature />
           
-          <h1 className="text-6xl md:text-[10rem] text-white font-bold mb-8 leading-[0.9] drop-shadow-2xl animate-[fadeInUp_1.5s_ease-out_forwards]">
+          <h1 className="text-5xl md:text-[9rem] text-white font-bold mb-8 leading-[0.9] drop-shadow-2xl animate-[fadeInUp_1.5s_ease-out_forwards]">
             The Luxury <br /> 
             of <span className="italic serif text-blue-300">Time.</span>
           </h1>
           
-          <p className="text-xl md:text-3xl text-white/90 font-light tracking-wide drop-shadow-lg opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards] mb-12 max-w-2xl">
+          <p className="text-lg md:text-2xl text-white/90 font-light tracking-wide drop-shadow-lg opacity-0 animate-[fadeInUp_1.5s_ease-out_0.5s_forwards] mb-12 max-w-xl">
             Invest in your future memories with a lifetime ticket to the world's most serene shores.
           </p>
 
           <div className="opacity-0 animate-[fadeInUp_1.5s_ease-out_0.8s_forwards]">
              <button 
               onClick={onContactClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-full font-bold text-xl transition-all transform hover:scale-105 shadow-2xl shadow-blue-500/40 inline-block"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-lg md:text-xl transition-all transform hover:scale-105 shadow-2xl shadow-blue-500/40 inline-block"
             >
               Join the Club
             </button>

@@ -101,45 +101,45 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
   };
 
   const getLogoHeight = () => {
-    const base = isScrolled ? 36 : 90;
+    const base = isScrolled ? 30 : 60;
     return (base * (config.scale / 100));
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-700 ease-in-out ${isScrolled ? 'bg-glass py-2 shadow-sm border-b border-slate-200/50' : 'bg-transparent py-8'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-700 ease-in-out ${isScrolled ? 'bg-glass py-2 shadow-sm border-b border-slate-200/50' : 'bg-transparent py-5 md:py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         
-        <div className="flex items-center gap-6 md:gap-12">
-          {/* Main Brand Text - Bold and Popping */}
-          <div className={`transition-all duration-700 transform ${isScrolled ? 'scale-[0.65]' : 'scale-100'} origin-left cursor-default select-none`}>
-            <div className="flex flex-col leading-none">
-              <span className={`text-5xl md:text-7xl font-black uppercase tracking-tighter drop-shadow-2xl transition-colors duration-500 ${isScrolled ? 'text-blue-600' : 'text-white'}`}>
+        <div className="flex items-center gap-6 md:gap-10">
+          {/* Main Brand Text - More refined to avoid Hero overlap */}
+          <div className={`transition-all duration-700 transform ${isScrolled ? 'scale-[0.8]' : 'scale-100'} origin-left cursor-default select-none`}>
+            <div className="flex flex-col leading-tight">
+              <span className={`text-2xl md:text-4xl font-black uppercase tracking-tighter transition-colors duration-500 ${isScrolled ? 'text-blue-600' : 'text-white'}`}>
                 Dream it
               </span>
-              <span className={`text-2xl md:text-4xl font-black uppercase tracking-[0.15em] transition-all duration-500 ${isScrolled ? 'text-slate-900' : 'text-blue-400 drop-shadow-[0_4px_10px_rgba(59,130,246,0.5)]'}`}>
+              <span className={`text-xs md:text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 ${isScrolled ? 'text-slate-900' : 'text-blue-400'}`}>
                 marketing
               </span>
             </div>
           </div>
 
           {/* Logo Slots */}
-          <div className="flex items-center gap-4 md:gap-8 transform-gpu transition-all duration-500">
+          <div className="flex items-center gap-3 md:gap-6 transform-gpu transition-all duration-500">
             {[1, 2].map((slot) => (
               <div key={slot} className="relative group flex items-center justify-center">
                 {slot === 1 ? (
                   config.logo1 ? (
                     <img src={config.logo1} alt="Logo 1" style={{ height: `${getLogoHeight()}px` }} className="object-contain transition-all duration-700" />
                   ) : isAdmin && (
-                    <div style={{ width: `${isScrolled ? 32 : 80}px`, height: `${isScrolled ? 32 : 80}px` }} className="border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center cursor-pointer hover:bg-white/10" onClick={() => fileInputRef1.current?.click()}>
-                      <i className="fas fa-plus text-xs text-white/30"></i>
+                    <div style={{ width: `${isScrolled ? 24 : 50}px`, height: `${isScrolled ? 24 : 50}px` }} className="border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center cursor-pointer hover:bg-white/10" onClick={() => fileInputRef1.current?.click()}>
+                      <i className="fas fa-plus text-[10px] text-white/30"></i>
                     </div>
                   )
                 ) : (
                   config.logo2 ? (
                     <img src={config.logo2} alt="Logo 2" style={{ height: `${getLogoHeight()}px` }} className="object-contain transition-all duration-700" />
                   ) : isAdmin && (
-                    <div style={{ width: `${isScrolled ? 32 : 80}px`, height: `${isScrolled ? 32 : 80}px` }} className="border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center cursor-pointer hover:bg-white/10" onClick={() => fileInputRef2.current?.click()}>
-                      <i className="fas fa-plus text-xs text-white/30"></i>
+                    <div style={{ width: `${isScrolled ? 24 : 50}px`, height: `${isScrolled ? 24 : 50}px` }} className="border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center cursor-pointer hover:bg-white/10" onClick={() => fileInputRef2.current?.click()}>
+                      <i className="fas fa-plus text-[10px] text-white/30"></i>
                     </div>
                   )
                 )}
@@ -169,8 +169,8 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
             onClick={onContactClick}
             className={`transition-all duration-700 transform hover:scale-105 font-bold uppercase tracking-widest ${
               isScrolled 
-                ? 'bg-blue-600 text-white px-6 py-2 text-[10px] rounded-full' 
-                : 'bg-white/10 backdrop-blur-md text-white border border-white/30 px-8 py-3 text-xs rounded-xl'
+                ? 'bg-blue-600 text-white px-5 py-2 text-[10px] rounded-full' 
+                : 'bg-white/10 backdrop-blur-md text-white border border-white/30 px-6 py-3 text-xs rounded-xl'
             }`}
           >
             {isScrolled ? 'Join' : 'Join the Club'}
