@@ -35,7 +35,6 @@ const AIPlanner: React.FC = () => {
       <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <circle cx="80" cy="20" r="30" fill="white" />
-          {/* Removed wavy path line */}
         </svg>
       </div>
 
@@ -139,9 +138,14 @@ const AIPlanner: React.FC = () => {
                     ))}
                     <div className="w-10 h-10 rounded-full bg-blue-500 border-2 border-indigo-900 flex items-center justify-center text-[10px] font-bold">+12k</div>
                   </div>
-                  <button className="text-blue-300 font-bold hover:text-white transition-colors flex items-center">
+                  <a 
+                    href="https://www.dreamvacs.com/resorts/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-300 font-bold hover:text-white transition-colors flex items-center"
+                  >
                     Check Availability <i className="fas fa-calendar-check ml-2"></i>
-                  </button>
+                  </a>
                 </div>
               </div>
             ) : (

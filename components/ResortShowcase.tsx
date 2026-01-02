@@ -185,7 +185,7 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {filteredResorts.map(resort => (
             <div 
               key={resort.id} 
@@ -202,12 +202,10 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
               
               {/* Top Bar - Locked UI Settings */}
               <div className="absolute top-4 left-4 flex justify-between items-center w-[calc(100%-2rem)] z-20">
-                {/* LARGE CENTRALIZED LABEL */}
                 <span className="text-sm font-bold tracking-widest uppercase bg-blue-600 text-white px-5 py-2 rounded-full shadow-lg min-w-[80px] inline-flex items-center justify-center">
                   {resort.category}
                 </span>
                 
-                {/* CAMERA BUTTON - ADMIN ONLY */}
                 {isAdmin && (
                   <button 
                     onClick={(e) => triggerUpload(e, resort.id)}
@@ -219,7 +217,6 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
                 )}
               </div>
 
-              {/* LOCKED LINK SETTINGS */}
               <a 
                 href={resort.url} 
                 target="_blank" 
@@ -240,17 +237,33 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <p className="text-slate-500 mb-6 italic serif text-lg">Seeking a different vibe?</p>
-          <a 
-            href="https://www.dreamvacs.com/resorts/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors group"
-          >
-            Explore Full Global Portfolio 
-            <i className="fas fa-external-link-alt ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
-          </a>
+        {/* Centralized Portfolio Section */}
+        <div className="relative py-20 px-8 bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl text-center">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -ml-48 -mb-48"></div>
+          
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <h3 className="text-3xl md:text-4xl font-bold text-white mb-6 serif tracking-tight">Access Our Full Portfolio</h3>
+            <p className="text-slate-400 text-lg mb-10 leading-relaxed italic serif font-light">
+              Explore our complete South African collection—from hidden gems in the Magaliesberg to exclusive Kruger Park lodges and coastal retreats beyond the horizon.
+            </p>
+
+            <div className="flex flex-col items-center gap-6">
+              <a 
+                href="https://www.dreamvacs.com/resorts/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-4 px-12 py-5 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 hover:scale-105 transition-all shadow-xl shadow-blue-600/20 group text-lg"
+              >
+                <span>Browse Entire Resort Collection</span>
+                <i className="fas fa-external-link-alt text-sm transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></i>
+              </a>
+              
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.4em] mt-4 opacity-60">
+                Global Affiliate Access Included
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
