@@ -90,14 +90,12 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
         const base64 = reader.result as string;
         setAgentPhoto(base64);
         
-        // Update local storage immediately so Header's 'Save & Lock' can grab it
         const savedBrand = localStorage.getItem(BRAND_CONFIG_KEY);
         let config = savedBrand ? JSON.parse(savedBrand) : {};
         config.agentPhoto = base64;
         
         try {
           localStorage.setItem(BRAND_CONFIG_KEY, JSON.stringify(config));
-          // Notify other components (Header) that agent photo updated
           window.dispatchEvent(new Event('storage'));
         } catch (err) {
           alert("Storage limit reached. Please use a smaller photo.");
@@ -107,9 +105,15 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
     }
   };
 
-  const saveSocialLinks = (newLinks: typeof DEFAULT_SOCIALS) => {
+  const handleSocialUpdate = (platform: keyof typeof DEFAULT_SOCIALS, value: string) => {
+    const newLinks = { ...socialLinks, [platform]: value };
     setSocialLinks(newLinks);
-    localStorage.setItem(SOCIAL_STORAGE_KEY, JSON.stringify(newLinks));
+  };
+
+  const saveSocialLinksToStorage = () => {
+    localStorage.setItem(SOCIAL_STORAGE_KEY, JSON.stringify(socialLinks));
+    setShowSocialEditor(false);
+    alert("Social links updated successfully.");
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -222,7 +226,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[11px] gap-6">
+        <div className="pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-[11px] gap-6 relative">
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
             <p className="text-slate-500 uppercase tracking-wider font-medium">© 2026. ACCREDITED AGENTS of the Dream Vacation club.</p>
             <div className="flex space-x-6">
@@ -232,17 +236,75 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
           </div>
           
           <div className="flex items-center gap-8">
-            <div className="flex items-center space-x-5 text-base">
+            <div className="flex items-center space-x-5 text-base relative">
               <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors"><i className="fab fa-facebook-f"></i></a>
               <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors"><i className="fab fa-instagram"></i></a>
               <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors"><i className="fab fa-tiktok"></i></a>
+              
               {isAdmin && (
-                <button onClick={() => setShowSocialEditor(!showSocialEditor)} className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${showSocialEditor ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-800 text-slate-500 hover:text-white'}`}>
-                  <i className="fas fa-cog"></i>
-                </button>
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowSocialEditor(!showSocialEditor)} 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${showSocialEditor ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'bg-slate-800 text-slate-500 hover:text-white'}`}
+                    title="Edit Social Media Links"
+                  >
+                    <i className="fas fa-cog"></i>
+                  </button>
+
+                  {/* Social Editor Panel */}
+                  {showSocialEditor && (
+                    <div className="absolute bottom-full right-0 mb-4 bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 min-w-[300px] z-[70] animate-[fadeInUp_0.3s_ease-out]">
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Edit Social Platforms</h4>
+                      <div className="space-y-4 mb-6">
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-bold uppercase text-slate-400 flex items-center gap-2">
+                            <i className="fab fa-facebook-f"></i> Facebook URL
+                          </label>
+                          <input 
+                            type="text" 
+                            value={socialLinks.facebook} 
+                            onChange={(e) => handleSocialUpdate('facebook', e.target.value)} 
+                            className="w-full text-[11px] p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-1 focus:ring-blue-500 outline-none text-slate-900"
+                            placeholder="https://facebook.com/..."
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-bold uppercase text-slate-400 flex items-center gap-2">
+                            <i className="fab fa-instagram"></i> Instagram URL
+                          </label>
+                          <input 
+                            type="text" 
+                            value={socialLinks.instagram} 
+                            onChange={(e) => handleSocialUpdate('instagram', e.target.value)} 
+                            className="w-full text-[11px] p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-1 focus:ring-blue-500 outline-none text-slate-900"
+                            placeholder="https://instagram.com/..."
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-bold uppercase text-slate-400 flex items-center gap-2">
+                            <i className="fab fa-tiktok"></i> TikTok URL
+                          </label>
+                          <input 
+                            type="text" 
+                            value={socialLinks.tiktok} 
+                            onChange={(e) => handleSocialUpdate('tiktok', e.target.value)} 
+                            className="w-full text-[11px] p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-1 focus:ring-blue-500 outline-none text-slate-900"
+                            placeholder="https://tiktok.com/@..."
+                          />
+                        </div>
+                      </div>
+                      <button 
+                        onClick={saveSocialLinksToStorage} 
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20"
+                      >
+                        Update Links
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
-            <button onClick={handleAdminClick} className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all ${isAdmin ? 'bg-blue-600/10 text-blue-400 border-blue-400/50' : 'border-slate-700 hover:border-slate-500 text-slate-500'}`}>
+            <button onClick={handleAdminClick} className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all ${isAdmin ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20' : 'border-slate-700 hover:border-slate-500 text-slate-500'}`}>
               {isAdmin ? "Exit Admin" : "Admin"}
             </button>
           </div>
@@ -257,7 +319,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
               <h3 className="text-2xl font-bold text-slate-900">Admin Login</h3>
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoFocus className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 text-slate-900" />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoFocus className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 text-slate-900 outline-none" />
               <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg">Enter Admin Mode</button>
               {error && <p className="text-red-500 text-xs text-center">{error}</p>}
             </form>
@@ -265,6 +327,13 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
           </div>
         </div>
       )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
     </footer>
   );
 };

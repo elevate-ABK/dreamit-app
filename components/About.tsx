@@ -41,12 +41,12 @@ const About: React.FC<AboutProps> = ({ onContactClick }) => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-12 gap-16 items-center">
           
-          {/* Visual Composition */}
+          {/* Visual Composition - Updated to DVC Lifestyle Imagery */}
           <div className="lg:col-span-7 relative">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl aspect-[4/5] md:aspect-video transform hover:scale-[1.02] transition-transform duration-700">
               <img 
-                src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=1200" 
-                alt="Luxury Resort Horizon" 
+                src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&q=80&w=1200" 
+                alt="Luxury Resort Lifestyle" 
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -54,8 +54,8 @@ const About: React.FC<AboutProps> = ({ onContactClick }) => {
             
             <div className="absolute -bottom-12 -right-6 md:-right-12 z-20 w-1/2 rounded-2xl overflow-hidden shadow-2xl border-8 border-white hidden md:block animate-[float_6s_ease-in-out_infinite]">
               <img 
-                src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&q=80&w=800" 
-                alt="Beachfront Moments" 
+                src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&q=80&w=800" 
+                alt="South African Safari Experience" 
                 className="w-full h-full object-cover aspect-square"
               />
             </div>
@@ -77,8 +77,8 @@ const About: React.FC<AboutProps> = ({ onContactClick }) => {
 
               <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
                 <p className="animate-[fadeInUp_1s_ease-out]">
-                  Perhaps it’s lounging beneath the warm sun, listening to the waves tugging at the shore, feeling the world slow down just for you. 
-                  Maybe it’s windows-down drives through the Magaliesberg with the kids, shared playlists, and the nostalgic scent of afternoon braais drifting through the air.
+                  Perhaps it’s lounging beneath the warm sun at <strong>Breakers Resort</strong>, listening to the waves tugging at the Umhlanga shore, feeling the world slow down just for you. 
+                  Maybe it’s windows-down drives through the Magaliesberg toward <strong>Mount Amanzi</strong> with the kids, shared playlists, and the nostalgic scent of afternoon braais drifting through the air.
                 </p>
                 
                 <div className="relative py-8 px-8 bg-slate-50 rounded-3xl border-l-4 border-blue-500 italic text-slate-900 serif text-2xl font-light leading-snug">
@@ -91,7 +91,7 @@ const About: React.FC<AboutProps> = ({ onContactClick }) => {
                 </p>
 
                 <p className="font-medium text-slate-800">
-                  If you value your time, you’ll want to become a member of <strong>Dream it marketing</strong>. We don't just sell vacations; we secure your future moments of peace.
+                  If you value your time, you’ll want to become a member of <strong>Dream Vacation Club</strong>. We don't just sell vacations; we secure your future moments of peace.
                 </p>
 
                 <div className="pt-6">

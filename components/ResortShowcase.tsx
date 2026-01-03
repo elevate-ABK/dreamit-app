@@ -4,12 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 const CATEGORIES = ['All', 'Sun', 'Safari', 'Sea', 'Mountain'];
 
 const DEFAULT_RESORTS = [
-{ 
+  { 
     id: 1, 
     name: 'Mount Amanzi', 
-    location: 'Magaliesberg, Gauteng', 
+    location: 'Hartbeespoort, Magaliesberg', 
     category: 'Sun', 
-    img: 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80&w=800',
+    img: 'https://images.unsplash.com/photo-1549693578-d683be217e58?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/mount-amanzi/'
   },
   { 
@@ -17,39 +17,39 @@ const DEFAULT_RESORTS = [
     name: "Finfoot Lake Reserve", 
     location: 'Greater Pilanesberg, North West', 
     category: 'Safari', 
-    img: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=800',
+    img: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://dreamresorts.co.za/hotels-resorts/finfoot-lake-reserve/explore/'
   },
   { 
     id: 3, 
     name: 'Alpine Heath Resort', 
-    location: 'Central Drakensberg, KZN', 
+    location: 'Northern Drakensberg, KZN', 
     category: 'Mountain', 
-    img: 'https://images.unsplash.com/photo-1515488764276-beab7607c1e6?auto=format&fit=crop&q=80&w=800',
+    img: 'https://images.unsplash.com/photo-1515488764276-beab7607c1e6?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/alpine-heath/'
   },
   { 
     id: 4, 
-    name: 'Breaker Resort', 
-    location: 'Umhlanga, Durban', 
+    name: 'Breakers Resort', 
+    location: 'Umhlanga Rocks, Durban', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
+    img: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/breakers-resort/'
   },
   { 
     id: 5, 
     name: 'Blue Marlin Hotel', 
-    location: 'Scottburgh, KZN South Coast', 
+    location: 'Scottburgh, South Coast', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800',
+    img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/blue-marlin-all-inclusive-seascape/'
   },
   { 
     id: 6, 
-    name: 'The Peninsula ', 
-    location: 'Sea Point', 
+    name: 'The Peninsula', 
+    location: 'Sea Point, Cape Town', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
+    img: 'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/the-peninsula-all-suite-hotel/'
   },
 ];

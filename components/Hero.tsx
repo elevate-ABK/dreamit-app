@@ -50,7 +50,7 @@ const Hero: React.FC<HeroProps> = ({ onContactClick }) => {
 
   return (
     <section id="home" className="relative h-screen flex items-center overflow-hidden bg-slate-900">
-      {/* 10-Second Cinematic "Scroll" Background */}
+      {/* Cinematic Coastal Background - Updated to authentic DVC style coastal sunset */}
       <div 
         className="absolute inset-0 z-0"
         style={{ 
@@ -61,7 +61,7 @@ const Hero: React.FC<HeroProps> = ({ onContactClick }) => {
         <div className="w-full h-full overflow-hidden">
           <img 
             src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000" 
-            alt="Luxury Beach" 
+            alt="Luxury Dream Vacation Coastal" 
             className="w-full h-full object-cover scale-110 animate-[cinematicScroll_15s_ease-in-out_infinite]"
           />
         </div>
