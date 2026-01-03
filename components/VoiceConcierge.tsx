@@ -122,10 +122,22 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
     setStatus('Connecting to Elena...');
 
     try {
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) throw new Error("API Key is missing.");
+      // Check for API key as per environment requirement
+      // @ts-ignore
+      const hasKey = typeof window.aistudio !== 'undefined' && await window.aistudio.hasSelectedApiKey();
+      if (!hasKey && typeof window.aistudio !== 'undefined') {
+          setStatus('Selecting API Key...');
+          // @ts-ignore
+          await window.aistudio.openSelectKey();
+      }
 
-      const ai = new GoogleGenAI({ apiKey });
+      const apiKey = process.env.API_KEY;
+      if (!apiKey && typeof window.aistudio === 'undefined') {
+        throw new Error("API Key is missing and Key Selector is unavailable.");
+      }
+
+      // Re-initialize AI client to ensure the latest key is used
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
 
@@ -190,7 +202,16 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
               setIsSpeaking(false);
             }
           },
-          onerror: (e) => { setError("Connection error."); setIsActive(false); },
+          onerror: (e: any) => { 
+            console.error("Live session error:", e);
+            if (e.message?.includes("Requested entity was not found")) {
+                // Reset key selection if entity missing (key issue)
+                // @ts-ignore
+                if (typeof window.aistudio !== 'undefined') window.aistudio.openSelectKey();
+            }
+            setError("Connection error. Please ensure a valid API key is selected."); 
+            setIsActive(false); 
+          },
           onclose: (e) => { setIsActive(false); }
         },
         config: {
@@ -210,7 +231,8 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
 
       sessionRef.current = await sessionPromise;
     } catch (err: any) {
-      setError(err.message);
+      console.error("Startup error:", err);
+      setError(err.message || "Elena is currently offline.");
       setStatus('Elena is unavailable.');
     }
   };
@@ -278,7 +300,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
                   </span>
                 </div>
 
-                {!isActive && !status.includes('Connecting') && (
+                {!isActive && (
                   <button onClick={startSession} className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-xl shadow-blue-600/20">
                     Reconnect Concierge
                   </button>
