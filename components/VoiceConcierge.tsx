@@ -151,7 +151,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
           },
           onmessage: async (message: LiveServerMessage) => {
             // Handle Tool Calls (Images)
-            if (message.toolCall) {
+            if (message.toolCall && message.toolCall.functionCalls) {
               for (const fc of message.toolCall.functionCalls) {
                 if (fc.name === 'display_resort_visuals') {
                   const id = (fc.args as any).destination_id;
