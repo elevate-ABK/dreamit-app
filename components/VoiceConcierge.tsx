@@ -123,20 +123,18 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
 
     try {
       // Check for API key as per environment requirement
-      // @ts-ignore
-      const hasKey = typeof window.aistudio !== 'undefined' && await window.aistudio.hasSelectedApiKey();
-      if (!hasKey && typeof window.aistudio !== 'undefined') {
+      const hasKey = await window.aistudio.hasSelectedApiKey();
+      if (!hasKey) {
           setStatus('Selecting API Key...');
-          // @ts-ignore
           await window.aistudio.openSelectKey();
       }
 
       const apiKey = process.env.API_KEY;
-      if (!apiKey && typeof window.aistudio === 'undefined') {
+      if (!apiKey) {
         throw new Error("API Key is missing and Key Selector is unavailable.");
       }
 
-      // Re-initialize AI client to ensure the latest key is used
+      // Re-initialize AI client to ensure the latest key is used right before connect
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
@@ -206,8 +204,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
             console.error("Live session error:", e);
             if (e.message?.includes("Requested entity was not found")) {
                 // Reset key selection if entity missing (key issue)
-                // @ts-ignore
-                if (typeof window.aistudio !== 'undefined') window.aistudio.openSelectKey();
+                window.aistudio.openSelectKey();
             }
             setError("Connection error. Please ensure a valid API key is selected."); 
             setIsActive(false); 

@@ -36,10 +36,8 @@ const VideoAnimator: React.FC<VideoAnimatorProps> = ({ onClose }) => {
 
   const startGeneration = async () => {
     // Check for API key as per Veo requirements
-    // @ts-ignore
     const hasKey = await window.aistudio.hasSelectedApiKey();
     if (!hasKey) {
-      // @ts-ignore
       await window.aistudio.openSelectKey();
     }
 
@@ -86,7 +84,6 @@ const VideoAnimator: React.FC<VideoAnimatorProps> = ({ onClose }) => {
     } catch (error: any) {
       console.error("Veo Error:", error);
       if (error.message?.includes("Requested entity was not found")) {
-        // @ts-ignore
         await window.aistudio.openSelectKey();
       } else {
         alert("Something went wrong with the generation. Please ensure you have a valid paid API key selected.");
