@@ -25,39 +25,42 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
   const [agentPhoto, setAgentPhoto] = useState<string | null>(null);
   const agentFileInputRef = useRef<HTMLInputElement>(null);
   
-  const [socialLinks, setSocialLinks] = useState(DEFAULT_SOCIALS);
+  // High-priority initialization to avoid flicker
+  const [socialLinks, setSocialLinks] = useState(() => {
+    try {
+      const saved = localStorage.getItem(SOCIAL_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : DEFAULT_SOCIALS;
+    } catch (e) {
+      return DEFAULT_SOCIALS;
+    }
+  });
+
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [email, setEmail] = useState('');
   const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [subError, setSubError] = useState('');
 
-  const loadAllConfigs = () => {
-    // Load agent photo
-    const savedBrand = localStorage.getItem(BRAND_CONFIG_KEY);
-    if (savedBrand) {
-      try {
-        const config = JSON.parse(savedBrand);
-        setAgentPhoto(config.agentPhoto || null);
-      } catch (e) {
-        console.error("Failed to load brand config", e);
-      }
-    }
-
-    // Load social links - Prioritize storage over defaults
-    const savedSocial = localStorage.getItem(SOCIAL_STORAGE_KEY);
-    if (savedSocial) {
-      try {
-        setSocialLinks(JSON.parse(savedSocial));
-      } catch (e) {
-        console.error("Failed to load social links", e);
-      }
-    }
-  };
-
   useEffect(() => {
-    loadAllConfigs();
-    window.addEventListener('storage', loadAllConfigs);
-    return () => window.removeEventListener('storage', loadAllConfigs);
+    const loadConfig = () => {
+      const savedBrand = localStorage.getItem(BRAND_CONFIG_KEY);
+      if (savedBrand) {
+        try {
+          const config = JSON.parse(savedBrand);
+          setAgentPhoto(config.agentPhoto || null);
+        } catch (e) {}
+      }
+      
+      const savedSocial = localStorage.getItem(SOCIAL_STORAGE_KEY);
+      if (savedSocial) {
+        try {
+          setSocialLinks(JSON.parse(savedSocial));
+        } catch (e) {}
+      }
+    };
+
+    loadConfig();
+    window.addEventListener('storage', loadConfig);
+    return () => window.removeEventListener('storage', loadConfig);
   }, []);
 
   const handleAdminClick = () => {
@@ -95,32 +98,25 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
         const savedBrand = localStorage.getItem(BRAND_CONFIG_KEY);
         let config = savedBrand ? JSON.parse(savedBrand) : {};
         config.agentPhoto = base64;
-        
-        try {
-          localStorage.setItem(BRAND_CONFIG_KEY, JSON.stringify(config));
-          window.dispatchEvent(new Event('storage'));
-        } catch (err) {
-          alert("Storage limit reached.");
-        }
+        localStorage.setItem(BRAND_CONFIG_KEY, JSON.stringify(config));
+        window.dispatchEvent(new Event('storage'));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleSocialChange = (key: keyof typeof DEFAULT_SOCIALS, value: string) => {
-    setSocialLinks(prev => ({ ...prev, [key]: value }));
+    setSocialLinks((prev: any) => ({ ...prev, [key]: value }));
     setSaveStatus('idle');
   };
 
   const saveSocialLinks = () => {
     setSaveStatus('saving');
-    // Minimal delay for UX feedback
+    localStorage.setItem(SOCIAL_STORAGE_KEY, JSON.stringify(socialLinks));
+    
     setTimeout(() => {
-      localStorage.setItem(SOCIAL_STORAGE_KEY, JSON.stringify(socialLinks));
       setSaveStatus('saved');
       window.dispatchEvent(new Event('storage'));
-      
-      // Keep panel open briefly so user sees the "Saved" state
       setTimeout(() => {
         setShowAdminSettings(false);
         setSaveStatus('idle');

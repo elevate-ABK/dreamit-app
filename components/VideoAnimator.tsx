@@ -35,10 +35,14 @@ const VideoAnimator: React.FC<VideoAnimatorProps> = ({ onClose }) => {
   };
 
   const startGeneration = async () => {
-    // Check for API key as per Veo requirements
-    const hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      await window.aistudio.openSelectKey();
+    const aistudio = (window as any).aistudio;
+    
+    // For Veo models, try to use aistudio selector if available
+    if (aistudio) {
+        const hasKey = await aistudio.hasSelectedApiKey();
+        if (!hasKey) {
+            await aistudio.openSelectKey();
+        }
     }
 
     setStep('generating');
@@ -83,10 +87,10 @@ const VideoAnimator: React.FC<VideoAnimatorProps> = ({ onClose }) => {
 
     } catch (error: any) {
       console.error("Veo Error:", error);
-      if (error.message?.includes("Requested entity was not found")) {
-        await window.aistudio.openSelectKey();
+      if (error.message?.includes("Requested entity was not found") && aistudio) {
+        await aistudio.openSelectKey();
       } else {
-        alert("Something went wrong with the generation. Please ensure you have a valid paid API key selected.");
+        alert("Something went wrong with the generation. Please ensure you have a valid API key.");
       }
       setStep('upload');
     } finally {

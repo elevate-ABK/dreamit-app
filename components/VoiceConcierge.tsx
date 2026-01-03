@@ -78,7 +78,6 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
   const sessionRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Audio utils
   const decode = (base64: string) => {
     const binaryString = atob(base64);
     const bytes = new Uint8Array(binaryString.length);
@@ -122,20 +121,12 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
     setStatus('Connecting to Elena...');
 
     try {
-      // Check for API key as per environment requirement
-      const hasKey = await window.aistudio.hasSelectedApiKey();
-      if (!hasKey) {
-          setStatus('Selecting API Key...');
-          await window.aistudio.openSelectKey();
-      }
-
       const apiKey = process.env.API_KEY;
       if (!apiKey) {
-        throw new Error("API Key is missing and Key Selector is unavailable.");
+        throw new Error("API Key is missing. Please check your environment variables.");
       }
 
-      // Re-initialize AI client to ensure the latest key is used right before connect
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
 
@@ -160,7 +151,6 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
             }
           },
           onmessage: async (message: LiveServerMessage) => {
-            // Handle Tool Calls (Images)
             if (message.toolCall && message.toolCall.functionCalls) {
               for (const fc of message.toolCall.functionCalls) {
                 if (fc.name === 'display_resort_visuals') {
@@ -175,7 +165,6 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
               }
             }
 
-            // Handle Audio
             const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
             if (base64Audio && outputAudioContextRef.current) {
               setIsSpeaking(true);
@@ -202,11 +191,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
           },
           onerror: (e: any) => { 
             console.error("Live session error:", e);
-            if (e.message?.includes("Requested entity was not found")) {
-                // Reset key selection if entity missing (key issue)
-                window.aistudio.openSelectKey();
-            }
-            setError("Connection error. Please ensure a valid API key is selected."); 
+            setError("Connection error. Elena is currently resting."); 
             setIsActive(false); 
           },
           onclose: (e) => { setIsActive(false); }
@@ -229,7 +214,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
       sessionRef.current = await sessionPromise;
     } catch (err: any) {
       console.error("Startup error:", err);
-      setError(err.message || "Elena is currently offline.");
+      setError("Elena is currently offline. Please ensure microphone access is granted.");
       setStatus('Elena is unavailable.');
     }
   };
@@ -320,7 +305,7 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
               </div>
             </div>
 
-            {error && <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-[10px] uppercase font-bold tracking-wider">{error}</div>}
+            {error && <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-[11px] font-bold leading-tight uppercase tracking-wider">{error}</div>}
 
             <p className="text-white/40 text-sm max-w-md leading-relaxed italic border-l-2 border-white/5 pl-6">
               "Tell me what your perfect day looks like, and I'll show you exactly where that memory is waiting to be made."
