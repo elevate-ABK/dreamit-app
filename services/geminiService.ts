@@ -1,8 +1,35 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-// Removed global 'ai' instance to ensure each call uses the latest API key from the user selection dialog.
-// This is critical for environments where the user can dynamically select their paid project key.
+/**
+ * Checks the current status of the API key and quota.
+ */
+export const testConnection = async (): Promise<{ status: 'ready' | 'limit' | 'error', message: string }> => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // Use the lightest model for a quick heartbeat check.
+    // Added thinkingBudget: 0 because maxOutputTokens is set, as per guidelines for 2.5/3 series models.
+    const response = await ai.models.generateContent({
+      model: 'gemini-flash-lite-latest',
+      contents: 'ping',
+      config: { 
+        maxOutputTokens: 1,
+        thinkingConfig: { thinkingBudget: 0 }
+      }
+    });
+
+    if (response.text) {
+      return { status: 'ready', message: 'API is online and quota is available.' };
+    }
+    return { status: 'error', message: 'Unexpected response from API.' };
+  } catch (error: any) {
+    console.error("Diagnostic Error:", error);
+    if (error.message?.includes('429') || error.message?.toLowerCase().includes('quota')) {
+      return { status: 'limit', message: 'Daily quota has been reached (429).' };
+    }
+    return { status: 'error', message: 'Connection issue or invalid key.' };
+  }
+};
 
 export const getHolidayRecommendation = async (
   preferences: string,
@@ -12,7 +39,6 @@ export const getHolidayRecommendation = async (
   guests: string
 ): Promise<string> => {
   try {
-    // Initialize GoogleGenAI right before making an API call to ensure it uses the most up-to-date API key.
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `
       Act as an elite travel concierge for "Dream it marketing". 
@@ -39,10 +65,6 @@ export const getHolidayRecommendation = async (
   }
 };
 
-/**
- * Service to calculate travel budgets and membership savings.
- * Grounded in South African luxury market rates and specific Portfolio benchmarks.
- */
 export const getBudgetEstimate = async (params: {
   destination: string;
   adults: number;
@@ -52,7 +74,6 @@ export const getBudgetEstimate = async (params: {
   endDate: string;
 }) => {
   try {
-    // Initialize GoogleGenAI right before making an API call to ensure it uses the most up-to-date API key.
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `
       Calculate a realistic luxury vacation budget for a stay at "${params.destination}".
@@ -122,18 +143,13 @@ export const getBudgetEstimate = async (params: {
   }
 };
 
-/**
- * Uses Google Maps Grounding to find elite hidden gems near a resort.
- */
 export const getNearbyExperiences = async (destination: string) => {
   try {
-    // Initialize GoogleGenAI right before making an API call to ensure it uses the most up-to-date API key.
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `Find 3-4 top-rated luxury hidden gems or exclusive experiences near ${destination}. 
     Focus on high-end dining, private spa retreats, or unique local landmarks. 
     Provide a short 1-sentence description for each.`;
 
-    // Maps grounding is only supported in Gemini 2.5 series models.
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -143,14 +159,10 @@ export const getNearbyExperiences = async (destination: string) => {
     });
 
     const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    
-    // Process text to find mentions and match them to chunks if possible.
-    // As per guidelines, we MUST extract URLs from groundingChunks and place sources.
     const experiences = chunks
       .filter((chunk: any) => chunk.maps && (chunk.maps.uri || chunk.maps.placeAnswerSources))
       .map((chunk: any) => {
         const maps = chunk.maps;
-        // Extracting snippets if available as per "includes groundingChunks.maps.placeAnswerSources.reviewSnippets"
         const reviewSnippets = maps.placeAnswerSources?.flatMap((source: any) => source.reviewSnippets || []) || [];
         
         return {

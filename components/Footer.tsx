@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { testConnection } from '../services/geminiService';
 
 interface FooterProps {
   isAdmin?: boolean;
@@ -23,9 +24,9 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [agentPhoto, setAgentPhoto] = useState<string | null>(null);
+  const [apiStatus, setApiStatus] = useState<{ status: 'idle' | 'ready' | 'limit' | 'error', message: string }>({ status: 'idle', message: 'Checking...' });
   const agentFileInputRef = useRef<HTMLInputElement>(null);
   
-  // High-priority initialization to avoid flicker
   const [socialLinks, setSocialLinks] = useState(() => {
     try {
       const saved = localStorage.getItem(SOCIAL_STORAGE_KEY);
@@ -39,6 +40,11 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
   const [email, setEmail] = useState('');
   const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [subError, setSubError] = useState('');
+
+  const checkApi = async () => {
+    const result = await testConnection();
+    setApiStatus(result);
+  };
 
   useEffect(() => {
     const loadConfig = () => {
@@ -59,6 +65,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
     };
 
     loadConfig();
+    checkApi();
     window.addEventListener('storage', loadConfig);
     return () => window.removeEventListener('storage', loadConfig);
   }, []);
@@ -68,6 +75,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
       if (onToggleAdmin) onToggleAdmin();
     } else {
       setShowLoginModal(true);
+      checkApi();
     }
   };
 
@@ -154,6 +162,17 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
     }
   };
 
+  const StatusPill = () => (
+    <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border ${
+      apiStatus.status === 'ready' ? 'bg-green-500/10 border-green-500/20 text-green-500' :
+      apiStatus.status === 'limit' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+      'bg-slate-500/10 border-slate-500/20 text-slate-500'
+    }`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${apiStatus.status === 'ready' ? 'bg-green-500 animate-pulse' : apiStatus.status === 'limit' ? 'bg-red-500' : 'bg-slate-500'}`}></span>
+      {apiStatus.status === 'ready' ? 'API Ready' : apiStatus.status === 'limit' ? 'Limit Reached' : 'API Offline'}
+    </div>
+  );
+
   return (
     <footer className="bg-slate-900 text-slate-400 py-20 border-t border-slate-800 relative">
       <div className="max-w-7xl mx-auto px-6">
@@ -238,7 +257,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
               {isAdmin && (
                 <div className="relative">
                   <button 
-                    onClick={() => setShowAdminSettings(!showAdminSettings)} 
+                    onClick={() => { setShowAdminSettings(!showAdminSettings); checkApi(); }} 
                     className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${showAdminSettings ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:text-white'}`}
                   >
                     <i className="fas fa-cog"></i>
@@ -246,9 +265,12 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
 
                   {showAdminSettings && (
                     <div className="absolute bottom-full right-0 mb-4 bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 min-w-[280px] z-[70] animate-[fadeInUp_0.3s_ease-out]">
-                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                        <i className="fas fa-link text-blue-500"></i> Social Media Profiles
-                      </h4>
+                      <div className="flex justify-between items-center mb-6">
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                          <i className="fas fa-link text-blue-500"></i> Social Media
+                        </h4>
+                        <StatusPill />
+                      </div>
                       
                       <div className="space-y-5 mb-8">
                         {(['facebook', 'instagram', 'tiktok'] as const).map(platform => (
@@ -294,7 +316,10 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-[fadeInUp_0.3s_ease-out]">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i className="fas fa-lock"></i></div>
-              <h3 className="text-2xl font-bold text-slate-900 serif">Admin Access</h3>
+              <h3 className="text-2xl font-bold text-slate-900 serif mb-2">Admin Access</h3>
+              <div className="flex justify-center mb-4">
+                <StatusPill />
+              </div>
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Passkey" autoFocus className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 text-slate-900 outline-none" />

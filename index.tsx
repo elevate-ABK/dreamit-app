@@ -3,16 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-// Rename the local interface to match global type definitions and avoid mismatch errors
-interface AIStudio {
-  hasSelectedApiKey: () => Promise<boolean>;
-  openSelectKey: () => Promise<void>;
-}
-
-// Global declaration to fix TypeScript errors for the AI Studio platform API
+// Global declaration to fix TypeScript errors for the AI Studio platform API.
+// Restored 'readonly' modifier to ensure alignment with existing global declarations
+// and resolve the "identical modifiers" error.
 declare global {
+  interface AIStudio {
+    hasSelectedApiKey: () => Promise<boolean>;
+    openSelectKey: () => Promise<void>;
+  }
+
   interface Window {
-    // Re-added readonly to match the underlying platform declaration provided by the environment
     readonly aistudio: AIStudio;
   }
 }
@@ -27,5 +27,5 @@ if (container) {
     </React.StrictMode>
   );
 } else {
-  console.error("Critical Error: Root element not found. Check your index.html.");
+  console.error("Critical Error: Root element not found.");
 }
