@@ -24,7 +24,10 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [agentPhoto, setAgentPhoto] = useState<string | null>(null);
-  const [apiStatus, setApiStatus] = useState<{ status: 'idle' | 'ready' | 'limit' | 'error', message: string }>({ status: 'idle', message: 'Checking...' });
+  const [apiStatus, setApiStatus] = useState<{ status: 'idle' | 'ready' | 'limit' | 'error' | 'billing', message: string }>({ 
+    status: 'idle', 
+    message: 'Checking...' 
+  });
   const agentFileInputRef = useRef<HTMLInputElement>(null);
   
   const [socialLinks, setSocialLinks] = useState(() => {
@@ -166,10 +169,19 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
     <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border ${
       apiStatus.status === 'ready' ? 'bg-green-500/10 border-green-500/20 text-green-500' :
       apiStatus.status === 'limit' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+      apiStatus.status === 'billing' ? 'bg-amber-500/10 border-amber-500/20 text-amber-600' :
       'bg-slate-500/10 border-slate-500/20 text-slate-500'
     }`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${apiStatus.status === 'ready' ? 'bg-green-500 animate-pulse' : apiStatus.status === 'limit' ? 'bg-red-500' : 'bg-slate-500'}`}></span>
-      {apiStatus.status === 'ready' ? 'API Ready' : apiStatus.status === 'limit' ? 'Limit Reached' : 'API Offline'}
+      <span className={`w-1.5 h-1.5 rounded-full ${
+        apiStatus.status === 'ready' ? 'bg-green-500 animate-pulse' : 
+        apiStatus.status === 'limit' ? 'bg-red-500' : 
+        apiStatus.status === 'billing' ? 'bg-amber-500' :
+        'bg-slate-500'
+      }`}></span>
+      {apiStatus.status === 'ready' ? 'API Ready' : 
+       apiStatus.status === 'limit' ? 'Quota Full' : 
+       apiStatus.status === 'billing' ? 'Billing Req.' :
+       'API Offline'}
     </div>
   );
 
@@ -218,7 +230,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
             </div>
           </div>
 
-          <div className="max-w-sm ml-auto w-full">
+          <div className="max-sm ml-auto w-full">
             <h4 className="text-white font-bold mb-6 text-sm uppercase tracking-widest text-center md:text-left">Newsletter</h4>
             {subStatus === 'success' ? (
               <div className="bg-blue-600/10 border border-blue-500/30 rounded-xl p-6 text-center">
