@@ -125,11 +125,11 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
           },
           onmessage: async (message: LiveServerMessage) => {
             if (message.serverContent?.inputTranscription) {
-              currentInputText.current = message.serverContent.inputTranscription.text;
+              currentInputText.current = message.serverContent.inputTranscription.text ?? '';
               setStatus('Listening...');
             }
             if (message.serverContent?.outputTranscription) {
-              currentOutputText.current += message.serverContent.outputTranscription.text;
+              currentOutputText.current += message.serverContent.outputTranscription.text ?? '';
               setStatus('Elena is speaking...');
             }
             if (message.serverContent?.turnComplete) {
@@ -147,7 +147,6 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
                 if (fc.name === 'display_resort_visuals') {
                   const id = (fc.args as any).destination_id;
                   if (RESORT_IMAGES[id]) setCurrentVisual(RESORT_IMAGES[id]);
-                  // Updated functionResponses to use an object instead of an array as per Live API rules.
                   sessionPromise.then(s => s?.sendToolResponse({
                     functionResponses: { id: fc.id, name: fc.name, response: { result: "Displayed" } }
                   }));
