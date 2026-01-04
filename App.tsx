@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -28,6 +28,19 @@ const App: React.FC = () => {
     setIsContactModalOpen(true);
   };
 
+  const handleAnimatorTrigger = async () => {
+    const aistudio = (window as any).aistudio;
+    if (aistudio) {
+      const hasKey = await aistudio.hasSelectedApiKey();
+      if (!hasKey) {
+        if (confirm("Video features require a Paid API Key. Would you like to select one now?")) {
+          await aistudio.openSelectKey();
+        }
+      }
+    }
+    setIsAnimatorOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       <Header onContactClick={openContactModal} isAdmin={isAdmin} />
@@ -45,7 +58,6 @@ const App: React.FC = () => {
         onLegalClick={(type) => setActiveLegalTab(type)}
       />
       
-      {/* Lead Capture Modal */}
       {isContactModalOpen && (
         <ContactFormModal onClose={() => setIsContactModalOpen(false)} />
       )}
@@ -53,19 +65,17 @@ const App: React.FC = () => {
       {/* Floating Concierge Trigger */}
       <button 
         onClick={() => setIsConciergeOpen(true)}
-        className="fixed bottom-8 right-8 z-[60] w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group overflow-hidden"
+        className="fixed bottom-8 right-8 z-[60] w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group"
       >
-        <div className="absolute inset-0 bg-blue-400 opacity-0 group-hover:opacity-20 animate-ping"></div>
-        <i className="fas fa-comment-dots text-2xl group-hover:hidden"></i>
-        <span className="hidden group-hover:block text-[10px] font-bold uppercase tracking-tighter">Concierge</span>
+        <div className="absolute inset-0 bg-blue-400 opacity-0 group-hover:opacity-20 animate-ping rounded-full"></div>
+        <i className="fas fa-comment-dots text-2xl"></i>
       </button>
 
-      {/* Experimental Video Feature Button (Admin/Power Users) */}
       {isAdmin && (
         <button 
-          onClick={() => setIsAnimatorOpen(true)}
-          className="fixed bottom-28 right-8 z-[60] w-12 h-12 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group"
-          title="Video Visionizer"
+          onClick={handleAnimatorTrigger}
+          className="fixed bottom-28 right-8 z-[60] w-12 h-12 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
+          title="Video Visionizer (Paid Key Req.)"
         >
           <i className="fas fa-film text-sm"></i>
         </button>

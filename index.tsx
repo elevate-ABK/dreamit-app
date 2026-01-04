@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 // Global declaration to fix TypeScript errors for the AI Studio platform API.
-// Removed the 'readonly' modifier to ensure alignment with existing global declarations
+// Restored the 'readonly' modifier to ensure alignment with existing global declarations
 // and resolve the "identical modifiers" error for the 'aistudio' property.
 declare global {
   interface AIStudio {
@@ -13,7 +13,7 @@ declare global {
   }
 
   interface Window {
-    aistudio: AIStudio;
+    readonly aistudio: AIStudio;
   }
 }
 
