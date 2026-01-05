@@ -18,6 +18,33 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        
+        /* Targeted Luxury Date Input Styles */
+        .luxury-date-input {
+            background-color: white !important;
+            color: #0f172a !important; /* slate-900 */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .luxury-date-input:focus {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px rgba(59, 130, 246, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        .luxury-date-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            /* Pure black with a crisp shadow */
+            filter: brightness(0) drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            padding: 2px;
+        }
+        
+        .luxury-date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
     </style>
 <script type="importmap">
 {

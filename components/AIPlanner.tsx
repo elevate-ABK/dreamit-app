@@ -69,7 +69,7 @@ const AIPlanner: React.FC = () => {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full luxury-date-input border border-white/20 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
                 </div>
                 <div className="space-y-2">

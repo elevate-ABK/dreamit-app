@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -11,7 +10,7 @@ declare global {
   }
 
   interface Window {
-    // Fixed: Removed the 'readonly' modifier to ensure this declaration matches the internal platform definition.
+    // Removed 'readonly' modifier to match the internal platform definition and fix the "identical modifiers" error.
     aistudio: AIStudio;
   }
 }

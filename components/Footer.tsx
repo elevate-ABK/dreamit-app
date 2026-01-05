@@ -6,17 +6,17 @@ interface FooterProps {
   isAdmin?: boolean;
   onToggleAdmin?: () => void;
   onLegalClick?: (type: 'privacy' | 'terms') => void;
-}
-
 const BRAND_CONFIG_KEY = 'dream_it_brand_config_v2';
 const SOCIAL_STORAGE_KEY = 'dream_it_social_links_v2';
+
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw82oR186SCMQlO1lCTrq37t7_NNjxIwEN90_kxm48AJiuxwT-cl48PEKr1LqNmgKir/exec';
 
-const DEFAULT_SOCIALS = {
-  facebook: 'https://www.instagram.com/dreamitmarketing.co.za',
-  instagram: 'https://www.instagram.com/dreamvacations_sa/',
+// Using Object.freeze ensures these are truly "hardcoded" and immutable
+const DEFAULT_SOCIALS = Object.freeze({
+  facebook: 'https://www.facebook.com/dreamitsa/',
+  instagram: 'https://www.instagram.com/dreamitmarketing.co.za',
   tiktok: 'https://www.tiktok.com/@dreamitmarketing.co.za'
-};
+});
 
 const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegalClick }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
