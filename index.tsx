@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 // Global declaration to fix TypeScript errors for the AI Studio platform API.
+// Removed 'readonly' modifier to resolve conflict with existing platform declarations.
 declare global {
   interface AIStudio {
     hasSelectedApiKey: () => Promise<boolean>;
@@ -10,8 +11,7 @@ declare global {
   }
 
   interface Window {
-    // Removed 'readonly' modifier to match the internal platform definition and fix the "identical modifiers" error.
-    aistudio: AIStudio;
+    aistudio?: AIStudio;
   }
 }
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { getBudgetEstimate } from '../services/geminiService';
 
@@ -136,21 +135,25 @@ const BudgetTool: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-blue-300">Check-In</label>
-                    <input 
-                      type="date" 
-                      value={params.startDate} 
-                      onChange={e => setParams({...params, startDate: e.target.value})} 
-                      className="w-full luxury-date-input border border-white/10 rounded-xl p-3 text-sm focus:outline-none" 
-                    />
+                    <div className="date-input-container">
+                      <input 
+                        type="date" 
+                        value={params.startDate} 
+                        onChange={e => setParams({...params, startDate: e.target.value})} 
+                        className="w-full luxury-date-input rounded-xl p-3 text-sm" 
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-blue-300">Check-Out</label>
-                    <input 
-                      type="date" 
-                      value={params.endDate} 
-                      onChange={e => setParams({...params, endDate: e.target.value})} 
-                      className="w-full luxury-date-input border border-white/10 rounded-xl p-3 text-sm focus:outline-none" 
-                    />
+                    <div className="date-input-container">
+                      <input 
+                        type="date" 
+                        value={params.endDate} 
+                        onChange={e => setParams({...params, endDate: e.target.value})} 
+                        className="w-full luxury-date-input rounded-xl p-3 text-sm" 
+                      />
+                    </div>
                   </div>
                 </div>
 

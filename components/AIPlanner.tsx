@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { getHolidayRecommendation } from '../services/geminiService';
 
@@ -65,12 +64,14 @@ const AIPlanner: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-blue-300">Check-in</label>
-                  <input 
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full luxury-date-input border border-white/20 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
+                  <div className="date-input-container">
+                    <input 
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full luxury-date-input rounded-xl p-3 text-slate-900"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-blue-300">Guests</label>

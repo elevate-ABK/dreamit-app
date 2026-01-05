@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,28 +22,52 @@
         .luxury-date-input {
             background-color: white !important;
             color: #0f172a !important; /* slate-900 */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            appearance: none;
         }
         
         .luxury-date-input:focus {
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px rgba(59, 130, 246, 0.5);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             transform: translateY(-1px);
+            outline: none;
         }
         
         .luxury-date-input::-webkit-calendar-picker-indicator {
             cursor: pointer;
-            /* Pure black with a crisp shadow */
-            filter: brightness(0) drop-shadow(0 1px 1px rgba(0,0,0,0.5));
-            opacity: 0.9;
+            filter: invert(0.4) sepia(1) saturate(5) hue-rotate(200deg);
+            opacity: 0.6;
             transition: all 0.2s ease;
-            padding: 2px;
+            padding: 4px;
+            margin-right: -4px;
         }
         
         .luxury-date-input::-webkit-calendar-picker-indicator:hover {
             opacity: 1;
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
+
+        .date-input-container {
+            position: relative;
+        }
+
+        .date-input-container::after {
+            content: '\f073';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3b82f6;
+            pointer-events: none;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .luxury-date-input::-webkit-datetime-edit { padding: 0.2em; }
     </style>
 <script type="importmap">
 {
