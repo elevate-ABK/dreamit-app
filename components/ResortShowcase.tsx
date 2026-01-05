@@ -13,12 +13,13 @@ const CATEGORIES = ['All', 'Sun', 'Safari', 'Sea', 'Mountain'];
 const CONST_RESORT_OVERRIDE: { id: number; img: string }[] = [];
 
 const DEFAULT_RESORTS = [
-  { 
+ { 
     id: 1, 
     name: 'Mount Amanzi', 
     location: 'Hartbeespoort, Magaliesberg', 
     category: 'Sun', 
-    img: 'https://images.unsplash.com/photo-1618245472895-780993510c43?auto=format&fit=crop&q=80&w=1200', 
+    // This direct link ensures the image loads properly from your Google Drive
+    img: 'https://lh3.googleusercontent.com/d/1d3FBnGXZ0Lj7Ku2rqiUabwiwVBPMpVeC', 
     url: 'https://www.dreamvacs.com/resorts/mount-amanzi/'
   },
   { 
@@ -34,7 +35,8 @@ const DEFAULT_RESORTS = [
     name: 'Alpine Heath Resort', 
     location: 'Northern Drakensberg, KZN', 
     category: 'Mountain', 
-    img: 'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&q=80&w=1200', 
+    // Direct link for Alpine Heath
+    img: 'http://googleusercontent.com/profile/picture/4', 
     url: 'https://www.dreamvacs.com/resorts/alpine-heath/'
   },
   { 
@@ -42,23 +44,26 @@ const DEFAULT_RESORTS = [
     name: 'Breakers Resort', 
     location: 'Umhlanga Rocks, Durban', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1533281813136-1e967a5b3a32?auto=format&fit=crop&q=80&w=1200', 
+    // Direct link for Breakers Resort
+    img: 'https://lh3.googleusercontent.com/d/1VSaUx955YPqpa-dhPAv9FtUfNOeyIw5J', 
     url: 'https://www.dreamvacs.com/resorts/breakers-resort/'
   },
-  { 
-    id: 5, 
-    name: 'Blue Marlin Hotel', 
-    location: 'Scottburgh, South Coast', 
-    category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1579624538964-f6558ec40a02?auto=format&fit=crop&q=80&w=1200', 
-    url: 'https://www.dreamvacs.com/resorts/blue-marlin-all-inclusive-seascape/'
-  },
-  { 
+ { 
+  id: 5, 
+  name: 'Blue Marlin Hotel', 
+  location: 'Scottburgh, South Coast', 
+  category: 'Sea', 
+  // This direct link points to your file "Blue Marlin view1.jpg"
+  img: 'https://lh3.googleusercontent.com/d/1B8znZyXl8lbdKKrZnVxq9LoX2Gg0qJKl', 
+  url: 'https://www.dreamvacs.com/resorts/blue-marlin-all-inclusive-seascape/'
+},
+{ 
     id: 6, 
     name: 'The Peninsula', 
     location: 'Sea Point, Cape Town', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&q=80&w=1200', 
+    // This direct link points to your file "drone-low-res-13.jpg"
+    img: 'https://lh3.googleusercontent.com/d/1nn9ymmX7LJlXU9VZNyxTKP2WgH4k4vRt', 
     url: 'https://www.dreamvacs.com/resorts/the-peninsula-all-suite-hotel/'
   },
 ];

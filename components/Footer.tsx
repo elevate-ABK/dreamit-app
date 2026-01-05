@@ -13,9 +13,9 @@ const SOCIAL_STORAGE_KEY = 'dream_it_social_links_v2';
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw82oR186SCMQlO1lCTrq37t7_NNjxIwEN90_kxm48AJiuxwT-cl48PEKr1LqNmgKir/exec';
 
 const DEFAULT_SOCIALS = {
-  facebook: 'https://www.facebook.com/DreamVacationsSA/',
+  facebook: 'https://www.instagram.com/dreamitmarketing.co.za',
   instagram: 'https://www.instagram.com/dreamvacations_sa/',
-  tiktok: 'https://www.tiktok.com/@dreamvacations_sa'
+  tiktok: 'https://www.tiktok.com/@dreamitmarketing.co.za'
 };
 
 const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegalClick }) => {
