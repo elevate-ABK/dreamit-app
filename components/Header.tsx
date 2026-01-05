@@ -16,7 +16,7 @@ const SOCIAL_STORAGE_KEY = 'dream_it_social_links_v2';
  * 1. Use the "Export Deployment JSON" button in the Admin Panel.
  * 2. Paste the resulting 'brand' object into this constant.
  */
-const CONST_BRAND_OVERRIDE: Partial<BrandConfig> | null = null;
+const CONST_BRAND_OVERRIDE: Partial<BrandConfig> = {};
 
 interface BrandConfig {
   logo1: string | null;
@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
       } catch (e) {
         console.error("Failed to load brand config", e);
       }
-    } else if (CONST_BRAND_OVERRIDE) {
+    } else if (Object.keys(CONST_BRAND_OVERRIDE).length > 0) {
       setConfig(prev => ({ ...prev, ...CONST_BRAND_OVERRIDE }));
     }
   };

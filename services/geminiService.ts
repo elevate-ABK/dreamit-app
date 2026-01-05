@@ -88,7 +88,10 @@ export const generateImage = async (prompt: string, aspectRatio: "1:1" | "3:4" |
   const candidate = response.candidates?.[0];
   if (!candidate) throw new Error("No candidates returned from image generation.");
 
-  for (const part of candidate.content.parts) {
+  const parts = candidate.content?.parts;
+  if (!parts) throw new Error("No content parts returned from image generation.");
+
+  for (const part of parts) {
     if (part.inlineData) {
       return `data:image/png;base64,${part.inlineData.data}`;
     }
