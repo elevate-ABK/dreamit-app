@@ -7,6 +7,16 @@ interface HeaderProps {
 }
 
 const BRAND_CONFIG_KEY = 'dream_it_brand_config_v2';
+const RESORT_STORAGE_KEY = 'dream_it_resorts_custom_v3';
+const SOCIAL_STORAGE_KEY = 'dream_it_social_links_v2';
+
+/**
+ * 🔒 PERMANENT BRANDING OVERRIDES
+ * To lock your design for all users on Vercel:
+ * 1. Use the "Export Deployment JSON" button in the Admin Panel.
+ * 2. Paste the resulting 'brand' object into this constant.
+ */
+const CONST_BRAND_OVERRIDE: Partial<BrandConfig> | null = null;
 
 interface BrandConfig {
   logo1: string | null;
@@ -19,11 +29,13 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showDesignPanel, setShowDesignPanel] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [exporting, setExporting] = useState(false);
   const [config, setConfig] = useState<BrandConfig>({
     logo1: null,
     logo2: null,
     agentPhoto: null,
     scale: 100,
+    ...CONST_BRAND_OVERRIDE
   });
   
   const fileInputRef1 = useRef<HTMLInputElement>(null);
@@ -33,10 +45,14 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
     const savedConfig = localStorage.getItem(BRAND_CONFIG_KEY);
     if (savedConfig) {
       try {
-        setConfig(JSON.parse(savedConfig));
+        const parsed = JSON.parse(savedConfig);
+        // Merge order: Default -> Hardcoded Override -> LocalStorage
+        setConfig(prev => ({ ...prev, ...CONST_BRAND_OVERRIDE, ...parsed }));
       } catch (e) {
         console.error("Failed to load brand config", e);
       }
+    } else if (CONST_BRAND_OVERRIDE) {
+      setConfig(prev => ({ ...prev, ...CONST_BRAND_OVERRIDE }));
     }
   };
 
@@ -47,17 +63,17 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     loadConfigFromStorage();
-    window.addEventListener('storage', loadConfigFromStorage);
+    window.addEventListener('storage', (e) => {
+      if (e.key === BRAND_CONFIG_KEY) loadConfigFromStorage();
+    });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('storage', loadConfigFromStorage);
     };
   }, []);
 
   const updateConfigLocally = (updates: Partial<BrandConfig>) => {
-    const newConfig = { ...config, ...updates };
-    setConfig(newConfig);
+    setConfig(prev => ({ ...prev, ...updates }));
     setSaveStatus('idle');
   };
 
@@ -65,26 +81,40 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
     setSaveStatus('saving');
     setTimeout(() => {
       try {
-        const currentStored = localStorage.getItem(BRAND_CONFIG_KEY);
-        let finalConfig = { ...config };
-        
-        if (currentStored) {
-           const parsed = JSON.parse(currentStored);
-           if (parsed.agentPhoto && !config.agentPhoto) {
-              finalConfig.agentPhoto = parsed.agentPhoto;
-           }
-        }
-
-        localStorage.setItem(BRAND_CONFIG_KEY, JSON.stringify(finalConfig));
+        localStorage.setItem(BRAND_CONFIG_KEY, JSON.stringify(config));
         window.dispatchEvent(new Event('storage'));
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 3000);
       } catch (e) {
         setSaveStatus('error');
-        alert("The images you uploaded are too large. Please use smaller files.");
+        alert("Images are too large for browser storage. Try using smaller files for the logos.");
         setTimeout(() => setSaveStatus('idle'), 4000);
       }
     }, 600);
+  };
+
+  const exportDeploymentManifest = () => {
+    setExporting(true);
+    const manifest = {
+      brand: config,
+      resorts: JSON.parse(localStorage.getItem(RESORT_STORAGE_KEY) || '[]'),
+      socials: JSON.parse(localStorage.getItem(SOCIAL_STORAGE_KEY) || '{}'),
+      exportedAt: new Date().toISOString()
+    };
+    
+    const manifestString = JSON.stringify(manifest, null, 2);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(manifestString).then(() => {
+      alert("🚀 Deployment Manifest copied to clipboard!\n\nTo 'Lock' this design forever on Vercel:\n1. Provide this JSON to your developer (or me).\n2. We will bake it into the constants for permanent deployment.");
+      setExporting(false);
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+      // Fallback: show in a prompt or console
+      console.log("MANIFEST:", manifestString);
+      alert("Check console for Manifest (Clipboard failed)");
+      setExporting(false);
+    });
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>, slot: 1 | 2) => {
@@ -110,7 +140,6 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         
         <div className="flex items-center gap-6 md:gap-10">
-          {/* Main Brand Text - More refined to avoid Hero overlap */}
           <div className={`transition-all duration-700 transform ${isScrolled ? 'scale-[0.8]' : 'scale-100'} origin-left cursor-default select-none`}>
             <div className="flex flex-col leading-tight">
               <span className={`text-2xl md:text-4xl font-black uppercase tracking-tighter transition-colors duration-500 ${isScrolled ? 'text-blue-600' : 'text-white'}`}>
@@ -122,7 +151,6 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
             </div>
           </div>
 
-          {/* Logo Slots */}
           <div className="flex items-center gap-3 md:gap-6 transform-gpu transition-all duration-500">
             {[1, 2].map((slot) => (
               <div key={slot} className="relative group flex items-center justify-center">
@@ -179,14 +207,45 @@ const Header: React.FC<HeaderProps> = ({ onContactClick, isAdmin = false }) => {
       </div>
 
       {showDesignPanel && (
-        <div className="absolute top-full left-6 mt-4 bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 min-w-[280px] z-[60]">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Brand Controls</h4>
-          <input type="range" min="20" max="400" value={config.scale} onChange={(e) => updateConfigLocally({ scale: parseInt(e.target.value) })} className="w-full mb-6" />
-          <button onClick={handleSaveAndLock} className={`w-full py-3 rounded-lg text-white text-[10px] font-bold uppercase tracking-widest transition-all ${saveStatus === 'saved' ? 'bg-green-500' : 'bg-slate-900'}`}>
-            {saveStatus === 'saved' ? 'Changes Locked' : 'Save & Lock Brand'}
-          </button>
+        <div className="absolute top-full left-6 mt-4 bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 min-w-[300px] z-[60] animate-[fadeInDown_0.3s_ease-out]">
+          <div className="flex justify-between items-center mb-4">
+             <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Brand Controls</h4>
+             <button 
+               onClick={exportDeploymentManifest}
+               disabled={exporting}
+               title="Export for GitHub/Vercel Deployment"
+               className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2 text-[9px] font-black uppercase tracking-widest"
+             >
+               {exporting ? <i className="fas fa-spinner animate-spin"></i> : <i className="fas fa-file-export"></i>}
+               Export Manifest
+             </button>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Logo Scale</label>
+              <input type="range" min="20" max="400" value={config.scale} onChange={(e) => updateConfigLocally({ scale: parseInt(e.target.value) })} className="w-full h-1 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+            </div>
+
+            <button onClick={handleSaveAndLock} className={`w-full py-3.5 rounded-xl text-white text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg ${saveStatus === 'saved' ? 'bg-green-500 shadow-green-100' : 'bg-slate-900 hover:bg-slate-800 shadow-slate-100'}`}>
+              {saveStatus === 'saving' ? <i className="fas fa-spinner animate-spin mr-2"></i> : null}
+              {saveStatus === 'saved' ? <><i className="fas fa-lock mr-2"></i> Design Locked (Local)</> : 'Save & Lock Locally'}
+            </button>
+            
+            <p className="text-[8px] text-slate-400 italic text-center leading-relaxed">
+              "Save & Lock" persists changes in THIS browser.<br/>
+              Use "Export Manifest" to lock design for ALL visitors.
+            </p>
+          </div>
         </div>
       )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
     </nav>
   );
 };

@@ -41,7 +41,6 @@ export const getHolidayRecommendation = async (
   guests: string
 ): Promise<string> => {
   try {
-    // Create fresh instance to ensure we use the latest injected key
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `
       Act as an elite travel concierge for "Dream it marketing". 
@@ -66,6 +65,35 @@ export const getHolidayRecommendation = async (
     if (error.message?.includes('429')) return "Quota reached. The free tier is currently resting. Please try again in a minute.";
     return "The dream is temporarily out of reach. Please ensure your API key is active.";
   }
+};
+
+/**
+ * Generates a high-quality image using Gemini 3 Pro Image Preview
+ */
+export const generateImage = async (prompt: string, aspectRatio: "1:1" | "3:4" | "4:3" | "9:16" | "16:9" = "3:4"): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-image-preview',
+    contents: {
+      parts: [{ text: prompt }],
+    },
+    config: {
+      imageConfig: {
+        aspectRatio: aspectRatio,
+        imageSize: "1K"
+      },
+    },
+  });
+
+  const candidate = response.candidates?.[0];
+  if (!candidate) throw new Error("No candidates returned from image generation.");
+
+  for (const part of candidate.content.parts) {
+    if (part.inlineData) {
+      return `data:image/png;base64,${part.inlineData.data}`;
+    }
+  }
+  throw new Error("No image data part found in the model response.");
 };
 
 export const getBudgetEstimate = async (params: {

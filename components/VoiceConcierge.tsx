@@ -7,12 +7,12 @@ interface VoiceConciergeProps {
 }
 
 const RESORT_IMAGES: Record<string, { name: string; location: string; url: string }> = {
-  'mount-amanzi': { name: 'Mount Amanzi', location: 'Hartbeespoort', url: 'https://images.unsplash.com/photo-1549693578-d683be217e58?auto=format&fit=crop&q=80&w=1200' },
+  'mount-amanzi': { name: 'Mount Amanzi', location: 'Hartbeespoort', url: 'https://images.unsplash.com/photo-1618245472895-780993510c43?auto=format&fit=crop&q=80&w=1200' },
   'finfoot': { name: 'Finfoot Lake Reserve', location: 'Vaalkop Dam', url: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=1200' },
-  'alpine-heath': { name: 'Alpine Heath Resort', location: 'Northern Drakensberg', url: 'https://images.unsplash.com/photo-1515488764276-beab7607c1e6?auto=format&fit=crop&q=80&w=1200' },
-  'breakers': { name: 'Breakers Resort', location: 'Umhlanga Rocks', url: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80&w=1200' },
-  'blue-marlin': { name: 'Blue Marlin Hotel', location: 'Scottburgh', url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=1200' },
-  'peninsula': { name: 'The Peninsula', location: 'Sea Point', url: 'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?auto=format&fit=crop&q=80&w=1200' },
+  'alpine-heath': { name: 'Alpine Heath Resort', location: 'Northern Drakensberg', url: 'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&q=80&w=1200' },
+  'breakers': { name: 'Breakers Resort', location: 'Umhlanga Rocks', url: 'https://images.unsplash.com/photo-1533281813136-1e967a5b3a32?auto=format&fit=crop&q=80&w=1200' },
+  'blue-marlin': { name: 'Blue Marlin Hotel', location: 'Scottburgh', url: 'https://images.unsplash.com/photo-1579624538964-f6558ec40a02?auto=format&fit=crop&q=80&w=1200' },
+  'peninsula': { name: 'The Peninsula', location: 'Sea Point', url: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&q=80&w=1200' },
   'safari': { name: 'The Safari Collection', location: 'South African Bushveld', url: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?auto=format&fit=crop&q=80&w=1200' },
   'coastal': { name: 'Coastal Escapes', location: 'KZN & Cape Shores', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1200' }
 };
@@ -117,7 +117,10 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
                 const int16 = new Int16Array(l);
                 for (let i = 0; i < l; i++) int16[i] = inputData[i] * 32768;
                 const pcm = { data: encode(new Uint8Array(int16.buffer)), mimeType: 'audio/pcm;rate=16000' };
-                sessionPromise.then(s => s?.sendRealtimeInput({ media: pcm }));
+                // CRITICAL: Solely rely on sessionPromise resolution and call session.sendRealtimeInput.
+                sessionPromise.then(session => {
+                  session.sendRealtimeInput({ media: pcm });
+                });
               };
               source.connect(scriptProcessor);
               scriptProcessor.connect(audioContextRef.current.destination);
@@ -147,9 +150,12 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
                 if (fc.name === 'display_resort_visuals') {
                   const id = (fc.args as any).destination_id;
                   if (RESORT_IMAGES[id]) setCurrentVisual(RESORT_IMAGES[id]);
-                  sessionPromise.then(s => s?.sendToolResponse({
-                    functionResponses: { id: fc.id, name: fc.name, response: { result: "Displayed" } }
-                  }));
+                  // CRITICAL: Solely rely on sessionPromise resolution and call session.sendToolResponse.
+                  sessionPromise.then(session => {
+                    session.sendToolResponse({
+                      functionResponses: { id: fc.id, name: fc.name, response: { result: "Displayed" } }
+                    });
+                  });
                 }
               }
             }

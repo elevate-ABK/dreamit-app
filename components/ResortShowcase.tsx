@@ -1,7 +1,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { generateImage } from '../services/geminiService';
 
 const CATEGORIES = ['All', 'Sun', 'Safari', 'Sea', 'Mountain'];
+
+/**
+ * 🔒 PERMANENT RESORT OVERRIDES
+ * To lock your AI images for all users on Vercel:
+ * 1. Use the "Export Deployment JSON" button in the Header Admin Panel.
+ * 2. Paste the resulting 'resorts' array into this constant.
+ */
+const CONST_RESORT_OVERRIDE: { id: number; img: string }[] = [];
 
 const DEFAULT_RESORTS = [
   { 
@@ -9,7 +18,7 @@ const DEFAULT_RESORTS = [
     name: 'Mount Amanzi', 
     location: 'Hartbeespoort, Magaliesberg', 
     category: 'Sun', 
-    img: 'https://images.unsplash.com/photo-1549693578-d683be217e58?auto=format&fit=crop&q=80&w=1200', 
+    img: 'https://images.unsplash.com/photo-1618245472895-780993510c43?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/mount-amanzi/'
   },
   { 
@@ -25,7 +34,7 @@ const DEFAULT_RESORTS = [
     name: 'Alpine Heath Resort', 
     location: 'Northern Drakensberg, KZN', 
     category: 'Mountain', 
-    img: 'https://images.unsplash.com/photo-1515488764276-beab7607c1e6?auto=format&fit=crop&q=80&w=1200', 
+    img: 'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/alpine-heath/'
   },
   { 
@@ -33,7 +42,7 @@ const DEFAULT_RESORTS = [
     name: 'Breakers Resort', 
     location: 'Umhlanga Rocks, Durban', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80&w=1200', 
+    img: 'https://images.unsplash.com/photo-1533281813136-1e967a5b3a32?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/breakers-resort/'
   },
   { 
@@ -41,7 +50,7 @@ const DEFAULT_RESORTS = [
     name: 'Blue Marlin Hotel', 
     location: 'Scottburgh, South Coast', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=1200', 
+    img: 'https://images.unsplash.com/photo-1579624538964-f6558ec40a02?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/blue-marlin-all-inclusive-seascape/'
   },
   { 
@@ -49,7 +58,7 @@ const DEFAULT_RESORTS = [
     name: 'The Peninsula', 
     location: 'Sea Point, Cape Town', 
     category: 'Sea', 
-    img: 'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?auto=format&fit=crop&q=80&w=1200', 
+    img: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&q=80&w=1200', 
     url: 'https://www.dreamvacs.com/resorts/the-peninsula-all-suite-hotel/'
   },
 ];
@@ -65,23 +74,38 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
   const [resortList, setResortList] = useState(DEFAULT_RESORTS);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTargetId, setUploadTargetId] = useState<number | null>(null);
+  const [isGenerating, setIsGenerating] = useState<number | null>(null);
 
   const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=800';
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    const hydrateImages = () => {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      let parsedCustom: { id: number; img: string }[] = [];
+      
       try {
-        const parsed = JSON.parse(saved);
-        const merged = DEFAULT_RESORTS.map(def => {
-          const custom = parsed.find((p: any) => p.id === def.id);
-          return custom ? { ...def, img: custom.img } : def;
-        });
-        setResortList(merged);
+        if (saved) parsedCustom = JSON.parse(saved);
       } catch (e) {
         console.error("Failed to load custom images", e);
       }
-    }
+
+      // Merge order: Default -> Override (baked in code) -> LocalStorage (current session)
+      const merged = DEFAULT_RESORTS.map(def => {
+        const hardcoded = CONST_RESORT_OVERRIDE.find(o => o.id === def.id);
+        const custom = parsedCustom.find(p => p.id === def.id);
+        
+        if (custom) return { ...def, img: custom.img };
+        if (hardcoded) return { ...def, img: hardcoded.img };
+        return def;
+      });
+      
+      setResortList(merged);
+    };
+
+    hydrateImages();
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) hydrateImages();
+    });
   }, []);
 
   const filteredResorts = activeTab === 'All' 
@@ -92,6 +116,52 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
     const target = e.currentTarget;
     if (target.src !== FALLBACK_IMAGE) {
       target.src = FALLBACK_IMAGE;
+    }
+  };
+
+  const handleAIGenerate = async (e: React.MouseEvent, resort: typeof DEFAULT_RESORTS[0]) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAdmin) return;
+
+    const aistudio = (window as any).aistudio;
+    if (aistudio) {
+      const hasKey = await aistudio.hasSelectedApiKey();
+      if (!hasKey) {
+        if (confirm("AI-generated destination photography requires a Paid API Key. Proceed to selection?")) {
+          await aistudio.openSelectKey();
+        } else {
+          return;
+        }
+      }
+    }
+
+    setIsGenerating(resort.id);
+    try {
+      let prompt = resort.id === 1 
+        ? "A high-quality professional travel photograph of Mount Amanzi resort in South Africa. The scene features the characteristic red-brown 'Harvey tile' roofed chalets and face-brick walls. In the background, the rugged, rocky Magaliesberg mountain ridges are prominent. The foreground includes lush green lawns and indigenous trees near the banks of the Crocodile River. Vertical 2:3 style aspect, no text, cinematic lighting, ultra-realistic."
+        : `A high-quality luxury travel photograph of ${resort.name} in ${resort.location}. Focus on ${resort.category} atmosphere, professional resort marketing photography, vertical 3:4 aspect, no text.`;
+
+      const base64 = await generateImage(prompt, "3:4");
+      
+      const updatedList = resortList.map(r => 
+        r.id === resort.id ? { ...r, img: base64 } : r
+      );
+      setResortList(updatedList);
+
+      const customData = updatedList
+        .filter(r => r.img.startsWith('data:'))
+        .map(r => ({ id: r.id, img: r.img }));
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customData));
+      window.dispatchEvent(new Event('storage'));
+    } catch (err: any) {
+      console.error("AI Generation Failed:", err);
+      alert(err.message?.includes('429') 
+        ? "Daily quota for high-quality image generation reached." 
+        : "The AI Visionizer is currently unavailable. Please check your project billing status.");
+    } finally {
+      setIsGenerating(null);
     }
   };
 
@@ -124,6 +194,7 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
         
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(customData));
+          window.dispatchEvent(new Event('storage'));
         } catch (err) {
           alert("Storage limit reached. Try using a smaller image file.");
         }
@@ -136,9 +207,9 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
 
   const resetToDefaults = () => {
     if (!isAdmin) return;
-    if (window.confirm("Are you sure you want to reset all custom images?")) {
-      setResortList(DEFAULT_RESORTS);
+    if (window.confirm("Are you sure you want to reset all custom images for THIS browser? (Baked-in overrides will remain)")) {
       localStorage.removeItem(STORAGE_KEY);
+      window.location.reload();
     }
   };
 
@@ -158,7 +229,7 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
             <span className="text-blue-600 font-bold tracking-widest uppercase text-sm mb-4 block">Exclusive Portfolio</span>
             <h2 className="text-4xl font-bold mb-4 text-slate-900 leading-tight">Featured Destinations</h2>
             <p className="text-slate-600 max-w-xl">
-              {isAdmin ? "Admin View: Click the camera icon on any tile to upload your own photos." : "Explore our hand-picked collection of luxury resorts near the sun, sea, and safari."}
+              {isAdmin ? "Admin: Click wand for AI photography. Use 'Export Manifest' in Header to save these images to GitHub/Vercel permanently." : "Explore our hand-picked collection of luxury resorts near the sun, sea, and safari."}
             </p>
           </div>
           
@@ -168,7 +239,7 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
                 onClick={resetToDefaults}
                 className="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 group"
               >
-                <i className="fas fa-undo-alt group-hover:rotate-[-45deg] transition-transform"></i> Reset Custom Images
+                <i className="fas fa-undo-alt group-hover:rotate-[-45deg] transition-transform"></i> Reset Local Session
               </button>
             )}
             <div className="flex flex-wrap gap-2">
@@ -191,6 +262,16 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
               key={resort.id} 
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] shadow-md hover:shadow-2xl transition-all duration-500 bg-slate-200"
             >
+              {isGenerating === resort.id && (
+                <div className="absolute inset-0 z-30 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center text-white text-center p-6">
+                  <div className="relative w-12 h-12 mb-4">
+                    <div className="absolute inset-0 border-2 border-white/20 rounded-full"></div>
+                    <div className="absolute inset-0 border-2 border-t-blue-500 rounded-full animate-spin"></div>
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Painting Atmosphere...</p>
+                </div>
+              )}
+
               <img 
                 src={resort.img} 
                 alt={resort.name}
@@ -200,20 +281,28 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
               
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity pointer-events-none"></div>
               
-              {/* Top Bar - Locked UI Settings */}
               <div className="absolute top-4 left-4 flex justify-between items-center w-[calc(100%-2rem)] z-20">
                 <span className="text-sm font-bold tracking-widest uppercase bg-blue-600 text-white px-5 py-2 rounded-full shadow-lg min-w-[80px] inline-flex items-center justify-center">
                   {resort.category}
                 </span>
                 
                 {isAdmin && (
-                  <button 
-                    onClick={(e) => triggerUpload(e, resort.id)}
-                    title="Upload Custom Image (Admin Only)"
-                    className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-xl border border-white/30"
-                  >
-                    <i className="fas fa-camera text-sm"></i>
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={(e) => handleAIGenerate(e, resort)}
+                      title="AI Generate High-Quality Photo"
+                      className="w-10 h-10 rounded-full bg-indigo-600/80 backdrop-blur-md text-white flex items-center justify-center hover:bg-indigo-600 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-xl border border-white/30"
+                    >
+                      <i className="fas fa-magic text-[10px]"></i>
+                    </button>
+                    <button 
+                      onClick={(e) => triggerUpload(e, resort.id)}
+                      title="Upload Custom Image"
+                      className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-xl border border-white/30"
+                    >
+                      <i className="fas fa-camera text-[10px]"></i>
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -237,7 +326,6 @@ const ResortShowcase: React.FC<ResortShowcaseProps> = ({ isAdmin = false }) => {
           ))}
         </div>
 
-        {/* Centralized Portfolio Section */}
         <div className="relative py-20 px-8 bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl text-center">
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] -ml-48 -mb-48"></div>
