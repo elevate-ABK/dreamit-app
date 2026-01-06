@@ -12,6 +12,7 @@ const SOCIAL_STORAGE_KEY = 'dream_it_social_links_v2';
 
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw82oR186SCMQlO1lCTrq37t7_NNjxIwEN90_kxm48AJiuxwT-cl48PEKr1LqNmgKir/exec';
 
+// PERMANENT HARDCODED LINKS
 const DEFAULT_SOCIALS = Object.freeze({
   facebook: 'https://www.facebook.com/dreamitsa/',
   instagram: 'https://www.instagram.com/dreamitmarketing.co.za',
@@ -30,14 +31,8 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
   });
   const agentFileInputRef = useRef<HTMLInputElement>(null);
   
-  const [socialLinks, setSocialLinks] = useState(() => {
-    try {
-      const saved = localStorage.getItem(SOCIAL_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : DEFAULT_SOCIALS;
-    } catch (e) {
-      return DEFAULT_SOCIALS;
-    }
-  });
+  // Logic updated to ignore localStorage and always use DEFAULT_SOCIALS
+  const [socialLinks] = useState(DEFAULT_SOCIALS);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [email, setEmail] = useState('');
@@ -58,13 +53,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
           setAgentPhoto(config.agentPhoto || null);
         } catch (e) {}
       }
-      
-      const savedSocial = localStorage.getItem(SOCIAL_STORAGE_KEY);
-      if (savedSocial) {
-        try {
-          setSocialLinks(JSON.parse(savedSocial));
-        } catch (e) {}
-      }
+      // Removed social links localStorage fetch to prevent "dreamvacations" override
     };
 
     loadConfig();
@@ -116,18 +105,11 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
     }
   };
 
-  const handleSocialChange = (key: keyof typeof DEFAULT_SOCIALS, value: string) => {
-    setSocialLinks((prev: any) => ({ ...prev, [key]: value }));
-    setSaveStatus('idle');
-  };
-
   const saveSocialLinks = () => {
     setSaveStatus('saving');
-    localStorage.setItem(SOCIAL_STORAGE_KEY, JSON.stringify(socialLinks));
-    
+    // We no longer save to localStorage to keep links permanent in the code
     setTimeout(() => {
       setSaveStatus('saved');
-      window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
         setShowAdminSettings(false);
         setSaveStatus('idle');
@@ -279,26 +261,15 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
                     <div className="absolute bottom-full right-0 mb-4 bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 min-w-[280px] z-[70] animate-[fadeInUp_0.3s_ease-out]">
                       <div className="flex justify-between items-center mb-6">
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                          <i className="fas fa-link text-blue-500"></i> Social Media
+                          <i className="fas fa-shield-alt text-blue-500"></i> Admin Panel
                         </h4>
                         <StatusPill />
                       </div>
                       
-                      <div className="space-y-5 mb-8">
-                        {(['facebook', 'instagram', 'tiktok'] as const).map(platform => (
-                          <div key={platform} className="space-y-1.5">
-                            <label className="text-[9px] font-bold uppercase text-slate-500 flex items-center gap-2">
-                              <i className={`fab fa-${platform === 'facebook' ? 'facebook-square' : platform}`}></i> {platform} URL
-                            </label>
-                            <input 
-                              type="text" 
-                              value={socialLinks[platform]} 
-                              onChange={(e) => handleSocialChange(platform, e.target.value)} 
-                              className="w-full text-[11px] p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-1 focus:ring-blue-500 outline-none text-slate-900"
-                              placeholder={`https://${platform}.com/...`}
-                            />
-                          </div>
-                        ))}
+                      <div className="mb-8">
+                        <p className="text-[11px] text-slate-600 leading-relaxed italic">
+                          Social media links are now permanently locked to Dream It Marketing brand standards.
+                        </p>
                       </div>
 
                       <button 
@@ -309,7 +280,7 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
                         } text-white`}
                       >
                         {saveStatus === 'saving' && <i className="fas fa-spinner animate-spin"></i>}
-                        {saveStatus === 'saved' ? <><i className="fas fa-lock"></i> Links Locked & Saved</> : 'Save & Lock Social Links'}
+                        {saveStatus === 'saved' ? <><i className="fas fa-lock"></i> Settings Synced</> : 'Confirm Branding'}
                       </button>
                     </div>
                   )}
