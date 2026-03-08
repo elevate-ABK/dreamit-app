@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   define: {
     // Specifically define the key to prevent ReferenceErrors in the browser
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY || '')
+    'process.env.API_KEY': JSON.stringify(process.env.API_KEY || process.env.GEMINI_API_KEY || ''),
+    'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || process.env.API_KEY || '')
   },
   build: {
     outDir: 'dist',

@@ -6,7 +6,9 @@ import { GoogleGenAI, Type } from "@google/genai";
  */
 export const testConnection = async (): Promise<{ status: 'ready' | 'limit' | 'error' | 'billing', message: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (!apiKey) throw new Error("API key is missing");
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: 'ping',
@@ -41,7 +43,8 @@ export const getHolidayRecommendation = async (
   guests: string
 ): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    const ai = new GoogleGenAI({ apiKey });
     const prompt = `
       Act as an elite travel concierge for "Dream it marketing". 
       Based on these trip details:
@@ -71,7 +74,8 @@ export const getHolidayRecommendation = async (
  * Generates a high-quality image using Gemini 3 Pro Image Preview
  */
 export const generateImage = async (prompt: string, aspectRatio: "1:1" | "3:4" | "4:3" | "9:16" | "16:9" = "3:4"): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
     model: 'gemini-3-pro-image-preview',
     contents: {
@@ -108,7 +112,8 @@ export const getBudgetEstimate = async (params: {
   endDate: string;
 }) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    const ai = new GoogleGenAI({ apiKey });
     const prompt = `
       Calculate a realistic luxury vacation budget for a stay at "${params.destination}".
       Check-In: ${params.startDate}

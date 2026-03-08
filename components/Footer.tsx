@@ -5,6 +5,7 @@ interface FooterProps {
   isAdmin?: boolean;
   onToggleAdmin?: () => void;
   onLegalClick?: (legalType: 'privacy' | 'terms') => void;
+  onCareersClick?: () => void;
 }
 
 const BRAND_CONFIG_KEY = 'dream_it_brand_config_v2';
@@ -19,7 +20,7 @@ const DEFAULT_SOCIALS = Object.freeze({
   tiktok: 'https://www.tiktok.com/@dreamitmarketing.co.za'
 });
 
-const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegalClick }) => {
+const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegalClick, onCareersClick }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showAdminSettings, setShowAdminSettings] = useState(false);
   const [password, setPassword] = useState('');
@@ -239,6 +240,10 @@ const Footer: React.FC<FooterProps> = ({ isAdmin = false, onToggleAdmin, onLegal
             <div className="flex space-x-6">
               <button onClick={() => onLegalClick?.('privacy')} className="hover:text-white">Privacy</button>
               <button onClick={() => onLegalClick?.('terms')} className="hover:text-white">Terms</button>
+              <button onClick={onCareersClick} className="hover:text-white flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                Careers
+              </button>
             </div>
           </div>
           

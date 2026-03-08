@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import VideoAnimator from './components/VideoAnimator';
 import VoiceConcierge from './components/VoiceConcierge';
 import ContactFormModal from './components/ContactFormModal';
+import CareersModal from './components/CareersModal';
 import LegalOverlay from './components/LegalOverlay';
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
   const [isAnimatorOpen, setIsAnimatorOpen] = useState(false);
   const [isConciergeOpen, setIsConciergeOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isCareersModalOpen, setIsCareersModalOpen] = useState(false);
   const [activeLegalTab, setActiveLegalTab] = useState<'privacy' | 'terms' | null>(null);
 
   const openContactModal = (e?: React.MouseEvent) => {
@@ -56,10 +58,15 @@ const App: React.FC = () => {
         isAdmin={isAdmin} 
         onToggleAdmin={() => setIsAdmin(!isAdmin)} 
         onLegalClick={(type) => setActiveLegalTab(type)}
+        onCareersClick={() => setIsCareersModalOpen(true)}
       />
       
       {isContactModalOpen && (
         <ContactFormModal onClose={() => setIsContactModalOpen(false)} />
+      )}
+
+      {isCareersModalOpen && (
+        <CareersModal onClose={() => setIsCareersModalOpen(false)} />
       )}
 
       {/* Floating Concierge Trigger */}
