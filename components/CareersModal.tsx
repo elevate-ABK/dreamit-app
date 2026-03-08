@@ -19,9 +19,30 @@ const CareersModal: React.FC<CareersModalProps> = ({ onClose }) => {
               We Are Hiring!
             </h2>
           </div>
-          <button onClick={onClose} className="w-12 h-12 rounded-full hover:bg-slate-200 flex items-center justify-center transition-all group">
-            <i className="fas fa-times text-slate-400 group-hover:text-slate-900 transition-colors"></i>
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => {
+                const url = `${window.location.origin}/#careers`;
+                navigator.clipboard.writeText(url);
+                const btn = document.getElementById('copy-link-btn');
+                if (btn) {
+                  const originalText = btn.innerHTML;
+                  btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+                  setTimeout(() => {
+                    btn.innerHTML = originalText;
+                  }, 2000);
+                }
+              }}
+              id="copy-link-btn"
+              className="h-10 px-4 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center gap-2 transition-all font-bold text-[10px] uppercase tracking-wider"
+            >
+              <i className="fas fa-link"></i>
+              Copy Link
+            </button>
+            <button onClick={onClose} className="w-12 h-12 rounded-full hover:bg-slate-200 flex items-center justify-center transition-all group">
+              <i className="fas fa-times text-slate-400 group-hover:text-slate-900 transition-colors"></i>
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Content */}

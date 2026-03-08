@@ -22,6 +22,20 @@ const App: React.FC = () => {
   const [isCareersModalOpen, setIsCareersModalOpen] = useState(false);
   const [activeLegalTab, setActiveLegalTab] = useState<'privacy' | 'terms' | null>(null);
 
+  useEffect(() => {
+    const checkUrlForCareers = () => {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      if (hash === '#careers' || params.get('section') === 'careers') {
+        setIsCareersModalOpen(true);
+      }
+    };
+
+    checkUrlForCareers();
+    window.addEventListener('hashchange', checkUrlForCareers);
+    return () => window.removeEventListener('hashchange', checkUrlForCareers);
+  }, []);
+
   const openContactModal = (e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
@@ -66,7 +80,13 @@ const App: React.FC = () => {
       )}
 
       {isCareersModalOpen && (
-        <CareersModal onClose={() => setIsCareersModalOpen(false)} />
+        <CareersModal onClose={() => {
+          setIsCareersModalOpen(false);
+          // Clean up URL if it contains the hash
+          if (window.location.hash === '#careers') {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }} />
       )}
 
       {/* Floating Concierge Trigger */}
