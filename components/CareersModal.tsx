@@ -133,12 +133,20 @@ const CareersModal: React.FC<CareersModalProps> = ({ onClose }) => {
                 operations@dreamit.co.za
               </a>
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-center gap-3 px-8 py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-500 transition-all shadow-lg hover:scale-105 active:scale-95 cursor-default">
+                <a 
+                  href="https://wa.me/27681503694"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-500 transition-all shadow-lg hover:scale-105 active:scale-95"
+                >
                   <i className="fab fa-whatsapp text-xl"></i>
                   <div>
                     <span className="block text-[10px] uppercase tracking-wider opacity-80">WhatsApp (Messages Only)</span>
-                    081 486 5776 / 068 150 3694
+                    068 150 3694
                   </div>
+                </a>
+                <div className="text-center text-[10px] text-slate-500">
+                  Alternative: 081 486 5776
                 </div>
               </div>
             </div>
