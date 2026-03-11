@@ -22,7 +22,7 @@ const CareersModal: React.FC<CareersModalProps> = ({ onClose }) => {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => {
-                const url = `${window.location.origin}/#careers`;
+                const url = 'https://app.dreamitmarketing.co.za/#careers';
                 navigator.clipboard.writeText(url);
                 const btn = document.getElementById('copy-link-btn');
                 if (btn) {
@@ -81,11 +81,11 @@ const CareersModal: React.FC<CareersModalProps> = ({ onClose }) => {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="mt-1 w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <i className="fas fa-calendar-check text-[10px] text-blue-600"></i>
+                    <i className="fas fa-star text-[10px] text-blue-600"></i>
                   </div>
                   <div>
-                    <strong className="block text-slate-900">Monthly Commission</strong>
-                    <span className="text-xs text-slate-500">Paid on the 15th</span>
+                    <strong className="block text-slate-900">R1000 Attendance Bonus</strong>
+                    <span className="text-xs text-slate-500">Reward for consistency</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">

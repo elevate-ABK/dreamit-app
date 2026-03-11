@@ -24,16 +24,35 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const checkUrlForCareers = () => {
-      const hash = window.location.hash;
+      const hash = window.location.hash.toLowerCase();
       const params = new URLSearchParams(window.location.search);
-      if (hash === '#careers' || params.get('section') === 'careers') {
+      
+      // More robust check: case-insensitive, partial match, and multiple query params
+      if (
+        hash.includes('careers') || 
+        params.get('section') === 'careers' || 
+        params.get('modal') === 'careers'
+      ) {
         setIsCareersModalOpen(true);
       }
     };
 
+    // Check immediately
     checkUrlForCareers();
+    
+    // Check again after short delays to handle potential race conditions
+    const t1 = setTimeout(checkUrlForCareers, 100);
+    const t2 = setTimeout(checkUrlForCareers, 500);
+
     window.addEventListener('hashchange', checkUrlForCareers);
-    return () => window.removeEventListener('hashchange', checkUrlForCareers);
+    window.addEventListener('popstate', checkUrlForCareers);
+    
+    return () => {
+      window.removeEventListener('hashchange', checkUrlForCareers);
+      window.removeEventListener('popstate', checkUrlForCareers);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, []);
 
   const openContactModal = (e?: React.MouseEvent) => {
