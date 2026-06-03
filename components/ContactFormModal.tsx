@@ -25,6 +25,21 @@ interface ContactFormModalProps {
  *       data.source || "Website Form"
  *     ]);
  *     
+ *     // 🔔 OWNER NOTIFICATION LOGIC
+ *     var ownerEmail = "operations@dreamit.co.za"; // Update to your notification email if needed or desired
+ *     var ownerSubject = "Awesome News! A new membership lead has joined.";
+ *     var ownerBody = "Awesome News! A new membership lead has joined.\n\n" +
+ *                     "Lead Profile Details:\n" +
+ *                     "------------------------\n" +
+ *                     "Name: " + (data.name || "N/A") + "\n" +
+ *                     "Email: " + (data.email || "N/A") + "\n" +
+ *                     "Phone: " + (data.phone || "N/A") + "\n" +
+ *                     "Horizon of Interest: " + (data.interest || "N/A") + "\n" +
+ *                     "Dream / Vision: " + (data.dream || "N/A") + "\n" +
+ *                     "Timestamp: " + (data.timestamp || new Date().toLocaleString()) + "\n" +
+ *                     "Source: " + (data.source || "Website Form") + "\n";
+ *     MailApp.sendEmail(ownerEmail, ownerSubject, ownerBody);
+ *     
  *     // 📧 AUTO-RESPONSE LOGIC
  *     if (data.email && data.email.includes('@')) {
  *       var subject = "Dream it marketing - Your Luxury Escape Begins";
