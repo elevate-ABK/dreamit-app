@@ -4,6 +4,7 @@ import { GoogleGenAI, Modality, LiveServerMessage, Type, FunctionDeclaration } f
 
 interface VoiceConciergeProps {
   onClose: () => void;
+  onContactClick?: () => void;
 }
 
 const RESORT_IMAGES: Record<string, { name: string; location: string; url: string }> = {
@@ -56,7 +57,9 @@ async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: 
   return buffer;
 }
 
-const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
+const ELENA_AVAILABLE = false;
+
+const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose, onContactClick }) => {
   const [sessionState, setSessionState] = useState<'idle' | 'connecting' | 'active' | 'error'>('idle');
   const [status, setStatus] = useState('Elena is resting...');
   const [currentVisual, setCurrentVisual] = useState<typeof RESORT_IMAGES['mount-amanzi'] | null>(null);
@@ -201,6 +204,65 @@ const VoiceConcierge: React.FC<VoiceConciergeProps> = ({ onClose }) => {
       setStatus('Unable to reach Elena');
     }
   };
+
+  if (!ELENA_AVAILABLE) {
+    return (
+      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md" onClick={onClose}></div>
+        
+        <div className="relative bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 flex flex-col p-10 md:p-12 text-center animate-[cardSlide_0.6s_ease-out]">
+          
+          <div className="mb-8">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              TEMPORARILY OFFLINE
+            </span>
+          </div>
+
+          <div className="space-y-4 mb-10">
+            <h4 className="text-xs font-black uppercase tracking-[0.4em] text-blue-400">AI Concierge Suite</h4>
+            <h2 className="text-4xl md:text-5xl font-bold text-white serif tracking-tight">Elena is Resting</h2>
+            <p className="text-slate-400 text-base max-w-md mx-auto leading-relaxed">
+              Our elite AI Concierge is currently undergoing routine system calibration and database fine-tuning to deliver even more breathtaking, bespoke holiday itineraries.
+            </p>
+          </div>
+
+          {/* Luxury Card Mockup */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left max-w-md mx-auto">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
+              <span className="text-white font-bold text-xs uppercase tracking-widest">Expected Arrival</span>
+              <span className="text-blue-400 font-bold text-xs uppercase tracking-widest">Summer 2026 Refresh</span>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed font-sans">
+              Elena's conversational model is being upgraded to feature full spatial and multimodal awareness across our upcoming private yacht, game reserve, and coastal expansion portfolios.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {onContactClick && (
+              <button 
+                onClick={onContactClick} 
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all shadow-xl shadow-blue-900/40 active:scale-95"
+              >
+                Inquire via Representative
+              </button>
+            )}
+            <button 
+              onClick={onClose} 
+              className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl border border-white/15 font-bold uppercase text-[10px] tracking-widest transition-all active:scale-95"
+            >
+              Back to Exploration
+            </button>
+          </div>
+
+        </div>
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes cardSlide { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        `}} />
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">

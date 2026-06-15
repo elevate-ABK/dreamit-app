@@ -132,7 +132,13 @@ const App: React.FC = () => {
       )}
 
       {isConciergeOpen && (
-        <VoiceConcierge onClose={() => setIsConciergeOpen(false)} />
+        <VoiceConcierge 
+          onClose={() => setIsConciergeOpen(false)} 
+          onContactClick={() => {
+            setIsConciergeOpen(false);
+            openContactModal();
+          }}
+        />
       )}
 
       {activeLegalTab && (
